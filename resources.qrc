@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/img/portraits">
+        <file alias="portrait_0">res/img/portraits/0.png</file>
+        <file alias="portrait_1">res/img/portraits/1.png</file>
+        <file alias="portrait_2">res/img/portraits/2.png</file>
+    </qresource>
+    <qresource prefix="/img/client">
+        <file alias="logo">res/img/client/logo.png</file>
+        <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
+    </qresource>
+</RCC>
