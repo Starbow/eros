@@ -35,9 +35,27 @@ Chat::~Chat()
 
 void Chat::btnJoin_click()
 {
+	if(mainUi_->txtRoomName->text().isEmpty())
+	{
+		QList<QListWidgetItem *> chatRooms = mainUi_->chatList->selectedItems();
+		foreach(QListWidgetItem *item, chatRooms)
+		{
+			QString currentRoom = item->text();
+
+			if(!currentRoom.isEmpty())
+			{
+				joinRoom(nameToRoom(currentRoom));
+			}
+		}	
+	}
+
 	if(mainUi_->txtRoomPassword->text().isEmpty())
 	{
 		joinRoom(client_->getChatRoom(mainUi_->txtRoomName->text()));
+	}
+	else if(mainUi_->txtRoomPassword->text() == "Chat" || "Matchmaking" || "Settings")
+	{
+		printf("Channel name: %s restricted\n",mainUi_->txtRoomPassword->text());
 	}
 	else
 	{
@@ -155,6 +173,7 @@ void Chat::writeLog(QString data)
 {	
 	//this will have to do since this is basically deprecated anyway
 	//mainUi_->statusBar->showMessage(data); 
+	printf("Debug WriteLog: %s\n", data);
 }
 
 void Chat::clientRefreshRooms()
