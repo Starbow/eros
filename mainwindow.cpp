@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include "chatwidget.h"
 
+
 MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	: QMainWindow(parent)
 {
@@ -21,6 +22,14 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	else
 	{		
 		ui.lblInformation->setText(config_->activeProfile()->username());
+		eros_ = new Eros(this);	
+		QObject::connect(eros_, SIGNAL(stateChanged(ErosState)), this, SLOT(debugStateChange(ErosState)));
+		eros_->connectToEros(config_->activeProfile()->server(), config_->activeProfile()->username(), config_->activeProfile()->token()); //just assume that its valid for now
+		
+		chat_ = new Chat(this, eros_, &ui, config_->activeProfile()->username().toStdString().c_str());
+		//debuging so i can know stuff
+		
+
 	}
 	settings_window_ = nullptr;
 	ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
@@ -29,6 +38,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	
 	QObject::connect(ui.tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(tabContainer_tabCloseRequested(int)));
 	QObject::connect(ui.lblBottomMenu, SIGNAL(linkActivated(const QString &)), this, SLOT(label_linkActivated(const QString&)));
+
+	
+
 //	ChatWidget *c1 = new ChatWidget(false, ui.tabChats);
 //	ChatWidget *c2 = new ChatWidget(true, ui.tabChats);
 
@@ -40,6 +52,11 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::debugStateChange(ErosState state)
+{
+	printf("Eros State:%i\n", state);
 }
 
 void MainWindow::label_linkActivated(const QString &link)

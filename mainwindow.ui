@@ -67,7 +67,7 @@
     <item>
      <widget class="QTabWidget" name="tabContainer">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -232,7 +232,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QListWidget" name="listWidget"/>
+            <widget class="QListWidget" name="chatList"/>
            </item>
            <item alignment="Qt::AlignRight">
             <widget class="QPushButton" name="btnRefreshChats">
@@ -307,7 +307,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="txtRoomName_2"/>
+               <widget class="QLineEdit" name="txtRoomPassword"/>
               </item>
              </layout>
             </widget>

@@ -7,7 +7,7 @@
 #include "settingswindow.h"
 #include "ui_mainwindow.h"
 #include "../liberos/eros.h"
-
+#include "Chat.h"
 
 class MainWindow : public QMainWindow
 {
@@ -23,8 +23,11 @@ private slots:
 	void label_linkActivated(const QString &link);
 	void tabContainer_tabCloseRequested(int index);
 
+	void debugStateChange(ErosState state);
+
 private:
 	Ui::MainWindow ui;
+
 	QString configPath_;
 	Eros *eros_;
 	Config *config_;
@@ -32,6 +35,10 @@ private:
 	QString username_;
 	QString authtoken_;
 	QString server_;
+
+	Chat *chat_;
+
+	
 };
 
 #endif // EROS_H
