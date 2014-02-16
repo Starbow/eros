@@ -14,8 +14,8 @@ Chat::Chat(QWidget *parent, Eros *client,  Ui::MainWindow *ui, const char *usern
 	//QObject::connect(mainUi_->btnLeave, SIGNAL(pressed()), this, SLOT(btnLeave_click()));
 	//QObject::connect(mainUi_->btnCreateRoom, SIGNAL(pressed()), this, SLOT(btnCreateRoom_click()));
 
-	//tab stuff TODO think about this, dont want people closing matchmaking or chat maybe we should just disalow it hmm
-	//QObject::connect(mainUi_->tabChatRooms, SIGNAL(tabCloseRequested(int)), this, SLOT(clientTabCloseRequested(int)));
+	
+	QObject::connect(mainUi_->tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(clientTabCloseRequested(int)));
 
 	//chat rooms
 	QObject::connect(client_, SIGNAL(chatRoomJoined(ChatRoom*)), this, SLOT(clientChatRoomJoined(ChatRoom*)));
@@ -185,9 +185,9 @@ void Chat::clientTabCloseRequested(int index)
 
 int Chat::nameToTabIndex(QString name)
 {
-	//no one is allowed to call their chat channel "Chat" "Matchmaking" now....
+	//TODO: make sure we can detect if its a chat widget or not otherwise we run into problems with rooms: "Matchmaking" "Chat" "Settings"
 	for(int i = 0; i < mainUi_->tabContainer->count(); ++i)
-	{
+	{		
 		if(mainUi_->tabContainer->tabText(i) == name)
 		{
 			return i;
