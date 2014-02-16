@@ -1,5 +1,5 @@
-#ifndef EROS_H
-#define EROS_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <QtWidgets/QMainWindow>
 #include <QSettings>
@@ -7,6 +7,7 @@
 #include "settingswindow.h"
 #include "ui_mainwindow.h"
 #include "../liberos/eros.h"
+
 
 class MainWindow : public QMainWindow
 {

@@ -17,7 +17,10 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 		this->settings_window_ = new SettingsWindow(this, this->config_);
 		int result = settings_window_->exec();
 		delete settings_window_;
-
+	}
+	else
+	{		
+		ui.lblInformation->setText(config_->activeProfile()->username());
 	}
 	settings_window_ = nullptr;
 	ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);

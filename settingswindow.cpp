@@ -96,27 +96,42 @@ void SettingsWindow::btnDeleteProfile_click()
 
 void SettingsWindow::cmbSearchRange_changed()
 {
-	config_->activeProfile()->setSearchRange(ui.cmbSearchRange->currentData().toInt());
+
+	QString searchRange = ui.cmbSearchRange->currentText();
+
+	config_->activeProfile()->setSearchRange(searchRangeToInt(searchRange));//ui.cmbSearchRange->currentText().toInt());//->currentData().toInt());
 }
 
 void SettingsWindow::cmbAutostart_changed()
 {
-	config_->setStartOnLogin(ui.cmbAutostart->currentData().toBool());
+
+	bool autostart = false;
+	if(ui.cmbAutostart->currentText() == "Yes")
+	{
+		autostart = true;
+	}
+
+	config_->setStartOnLogin(autostart);//ui.cmbAutostart->currentData().toBool());
 }
 
 void SettingsWindow::cmbChatLinks_changed()
 {
-	config_->activeProfile()->setChatLinks(ui.cmbChatLinks->currentData().toBool());
+	bool links = false;
+	if(ui.cmbChatLinks->currentText() == "Yes")
+	{
+		links = true;
+	}
+	config_->activeProfile()->setChatLinks(links);
 }
 
 void SettingsWindow::cmbLanguage_changed()
 {
-	config_->activeProfile()->setLanguage(ui.cmbLanguage->currentData().toString());
+	config_->activeProfile()->setLanguage(ui.cmbLanguage->currentText());
 }
 
 void SettingsWindow::cmbServer_changed()
 {
-	config_->activeProfile()->setLanguage(ui.cmbServer->currentData().toString());
+	config_->activeProfile()->setServer(ui.cmbServer->currentText());
 }
 
 void SettingsWindow::btnOK_click()
@@ -246,9 +261,63 @@ void SettingsWindow::refreshProfileInterface()
 	}
 
 	//set options
-	ui.cmbSearchRange->setCurrentIndex(ui.cmbSearchRange->findData(this->config_->activeProfile()->searchRange()));
-	ui.cmbAutostart->setCurrentIndex(ui.cmbChatLinks->findData(config_->startOnLogin()));
-	ui.cmbChatLinks->setCurrentIndex(ui.cmbChatLinks->findData(this->config_->activeProfile()->chatLinks()));
-	ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findData(this->config_->activeProfile()->language()));
-	ui.cmbServer->setCurrentIndex(ui.cmbServer->findData(this->config_->activeProfile()->server()));
+	QString searchRange = intToSearchRange(config_->activeProfile()->searchRange());
+	
+	ui.cmbSearchRange->setCurrentIndex(ui.cmbSearchRange->findText(searchRange));
+	ui.cmbAutostart->setCurrentIndex(ui.cmbAutostart->findText(boolToYesNo(config_->startOnLogin())));
+	ui.cmbChatLinks->setCurrentIndex(ui.cmbChatLinks->findText(boolToYesNo(this->config_->activeProfile()->chatLinks())));
+	ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findText(this->config_->activeProfile()->language()));
+	ui.cmbServer->setCurrentIndex(ui.cmbServer->findText(this->config_->activeProfile()->server()));
+}
+
+const short int SettingsWindow::searchRangeToInt(QString searchRange)
+{
+	if(searchRange == "Narrow")
+	{
+		return 1;
+	}
+	else if(searchRange == "Normal")
+	{
+		return 2;
+	}
+	else if(searchRange == "Wide")
+	{
+		return 0;
+	}
+	else
+	{
+		return -1; //default is empty
+	}
+}
+
+const QString SettingsWindow::intToSearchRange(const short int searchRange)
+{
+	if(searchRange == 1)
+	{
+		return "Narrow";
+	}
+	else if(searchRange == 2)
+	{
+		return "Normal";
+	}
+	else if(searchRange == 0)		
+	{
+		return "Wide";
+	}
+	else
+	{
+		return "";//default is empty
+	}
+}
+
+const QString SettingsWindow::boolToYesNo(bool yesno)
+{
+	if(yesno)
+	{
+		return "Yes";
+	}
+	else
+	{
+		return "No";
+	}
 }
