@@ -1,21 +1,57 @@
-#ifndef SETTINGSWINDOW_H
-#define SETTINGSWINDOW_H
+#ifndef EROS_SETTINGSWINDOW_H
+#define EROS_SETTINGSWINDOW_H
 
-#include <QDialog>
-#include <QSettings>
 #include "ui_settingswindow.h"
+#include <QDialog>
+#include <QInputDialog>
+#include <QMessageBox>
+
+
+#include "config.h"
 
 class SettingsWindow : public QDialog
 {
 	Q_OBJECT
 
 public:
-	SettingsWindow(QWidget *parent, QSettings *settings);
+	SettingsWindow(QWidget *parent, Config *cfg); 
 	~SettingsWindow();
 
+
+private slots:	
+	void cmbSearchRange_changed();
+	void cmbAutostart_changed();
+	void cmbChatLinks_changed();
+	void cmbLanguage_changed();
+	void cmbServer_changed();
+
+	void cmbProfiles_changed();
+	void btnOK_click();
+	void btnSetToken_click();
+
+	//creates a new user profile (not actually saved to file until btnOK_click())
+	void btnNewProfile_click();
+
+	//warns the user that the profile is being deleted and then deletes it (not actually deleted from file until btnOK_click())
+	void btnDeleteProfile_click();
+
 private:
-	Ui::settingsWindow ui;
-	QSettings *settings_;
+	Ui::SettingsDialog ui;
+	Config *config_;
+
+	//reconnects everything to the options window
+	void reconnectGUI();
+
+	//check if the specified user name already exists or not
+	bool profileExists(QString profileName);
+
+
+	//disable/enable the profile section of the interface
+	void disableProfileInterface();
+	void enableProfileInterface();	
+
+	//refresh the conents of the interface
+	void refreshProfileInterface();
 };
 
-#endif // SETTINGSWINDOW_H
+#endif // EROS_SETTINGSWINDOW_H

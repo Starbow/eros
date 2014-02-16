@@ -1,11 +1,26 @@
 <RCC>
-    <qresource prefix="/img/portraits">
-        <file alias="portrait_0">res/img/portraits/0.png</file>
-        <file alias="portrait_1">res/img/portraits/1.png</file>
-        <file alias="portrait_2">res/img/portraits/2.png</file>
-    </qresource>
-    <qresource prefix="/img/client">
-        <file alias="logo">res/img/client/logo.png</file>
-        <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
-    </qresource>
+  <qresource prefix="/img/portraits">
+    <file alias="portrait_0">res/img/portraits/0.png</file>
+    <file alias="portrait_1">res/img/portraits/1.png</file>
+    <file alias="portrait_2">res/img/portraits/2.png</file>
+  </qresource>
+  <qresource prefix="/img/client/rank_icons">
+    <file alias="league_1">res/img/client/large_icons/league_1.png</file>
+    <file alias="league_2">res/img/client/large_icons/league_2.png</file>
+    <file alias="league_3">res/img/client/large_icons/league_3.png</file>
+    <file alias="league_4">res/img/client/large_icons/league_4.png</file>
+    <file alias="league_5">res/img/client/large_icons/league_5.png</file>
+  </qresource>
+  <qresource prefix="/img/client">
+    <file alias="logo">res/img/client/logo.png</file>
+    <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
+  </qresource>
+  <qresource prefix="/img/client/icons">
+    <file alias="bow">res/img/client/icons/bow.png</file>
+    <file alias="league_1">res/img/client/icons/league_1.png</file>
+    <file alias="league_2">res/img/client/icons/league_2.png</file>
+    <file alias="league_3">res/img/client/icons/league_3.png</file>
+    <file alias="league_4">res/img/client/icons/league_4.png</file>
+    <file alias="league_5">res/img/client/icons/league_5.png</file>
+  </qresource>
 </RCC>

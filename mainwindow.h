@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QSettings>
+#include "config.h"
+#include "settingswindow.h"
 #include "ui_mainwindow.h"
 #include "../liberos/eros.h"
 
@@ -16,13 +18,16 @@ public:
 
 	void loadSettings();
 	void saveSettings();
+private slots:
+	void label_linkActivated(const QString &link);
+	void tabContainer_tabCloseRequested(int index);
 
 private:
 	Ui::MainWindow ui;
 	QString configPath_;
 	Eros *eros_;
-	QSettings *settings_;
-
+	Config *config_;
+	SettingsWindow *settings_window_;
 	QString username_;
 	QString authtoken_;
 	QString server_;

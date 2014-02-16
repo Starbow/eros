@@ -5,7 +5,11 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-
+	a.setOrganizationDomain("starbowmod.com");
+	a.setOrganizationName("Starbow");
+	a.setApplicationName("Eros");
+	a.setApplicationDisplayName("Eros");
+	
 	Eros *eros = new Eros(0);
 	QThread *erosThread = new QThread();
 	eros->moveToThread(erosThread);
