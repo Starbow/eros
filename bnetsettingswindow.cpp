@@ -10,6 +10,8 @@ BnetSettingsWindow::BnetSettingsWindow(QWidget *parent, Config *cfg)
 	QDialog::connect(ui.btnDeleteProfile, SIGNAL(pressed()), this, SLOT(clientRemoveBnetProfile()));
 	QDialog::connect(ui.cmbProfiles, SIGNAL(currentIndexChanged(const QString)), this, SLOT(clientChangeProfile()));
 
+	
+
 	if(cfg_->activeProfile()->getActiveBnetProfile().isEmpty() == false)
 	{
 		QString activebnet = cfg_->activeProfile()->getActiveBnetProfile();
@@ -37,8 +39,8 @@ void BnetSettingsWindow::clientNewManualProfile()
 	if(!bnetProfileAlreadyExists(bnetUrl) && validateBnetUrl(bnetUrl) && ok == true)
 	{
 		//do stuff with cfg_
-		cfg_->activeProfile()->addBnetProfile(bnetUrl);
-		
+		cfg_->activeProfile()->addBnetProfile(bnetUrl);	
+
 		ui.cmbProfiles->addItem(bnetUrl);
 	}
 	else if(bnetProfileAlreadyExists(bnetUrl))

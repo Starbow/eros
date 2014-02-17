@@ -70,6 +70,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	
 
 
+	
+
+
 	// UI Stuff
 	settings_window_ = nullptr;
 	bnetsettings_window_ = nullptr;
@@ -86,6 +89,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(ui.cmbRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbRegion_currentIndexChanged(int)));
 	QObject::connect(ui.btnQueue, SIGNAL(pressed()), this, SLOT(btnQueue_pressed()));
 
+	//im not sure why this doesnt work
+	QObject::connect(config_->activeProfile(), SIGNAL(bnetAccountAdded(const QString)), eros_, SIGNAL(addCharacter(const QString)));
 
 	this->connection_timer_->setInterval(500);
 	this->connection_timer_->start();
@@ -468,7 +473,7 @@ void MainWindow::openBnetSettings()
 	{
 		bnetsettings_window_ = new BnetSettingsWindow(this, config_);
 		ui.tabContainer->insertTab(3, bnetsettings_window_, "Battle.net Accounts");
-		ui.tabContainer->setCurrentIndex(3);
+		ui.tabContainer->setCurrentIndex(3);		
 	}
 	else
 	{

@@ -44,6 +44,7 @@ public:
 
 signals:
 	void activeBnetProfileChanged(QString bnetprofile);
+	void bnetAccountAdded(QString bnetUrl);
 
 private:
 	QSettings *settings_;

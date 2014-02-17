@@ -5,7 +5,6 @@
 #include <QDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-//#include <mainwindow.h>
 #include <bnetsettingswindow.h>
 
 #include "config.h"
@@ -35,8 +34,6 @@ private slots:
 
 	//warns the user that the profile is being deleted and then deletes it (not actually deleted from file until btnOK_click())
 	void btnDeleteProfile_click();
-
-	//void btnBnetAccounts_click();
 
 private:
 	Ui::SettingsDialog ui;

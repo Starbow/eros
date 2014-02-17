@@ -111,6 +111,7 @@ void Profile::setSearchRange(int range)
 void Profile::addBnetProfile(QString bnetprofile)
 {
 	bnetProfiles_.append(bnetprofile);
+	emit bnetAccountAdded(bnetprofile);
 }
 void Profile::removeBnetProfile(QString bnetprofile)
 {
