@@ -7,11 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>659</width>
-    <height>275</height>
+    <height>185</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+	background-color: #fff;
+}</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_6">
    <item>
@@ -117,8 +122,8 @@
      <property name="title">
       <string>Options</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" alignment="Qt::AlignTop">
        <widget class="QFrame" name="frameSearchRange">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -127,6 +132,21 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QFormLayout" name="formLayout_4">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="lblSearchRange">
            <property name="text">
@@ -159,7 +179,52 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0" alignment="Qt::AlignTop">
+       <widget class="QFrame" name="frameLinks">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblChatLinks">
+           <property name="text">
+            <string>Display links in the chatbox</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="cmbChatLinks">
+           <item>
+            <property name="text">
+             <string>No</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Yes</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0" alignment="Qt::AlignTop">
        <widget class="QFrame" name="frameAutostart">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -170,6 +235,18 @@
         <layout class="QFormLayout" name="formLayout_3">
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="lblAutostart">
@@ -195,40 +272,7 @@
         </layout>
        </widget>
       </item>
-      <item>
-       <widget class="QFrame" name="frameLinks">
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QFormLayout" name="formLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="lblChatLinks">
-           <property name="text">
-            <string>Display links in the chatbox</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="cmbChatLinks">
-           <item>
-            <property name="text">
-             <string>No</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Yes</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QFrame" name="frameLanguage">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -237,6 +281,18 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QFormLayout" name="formLayout_5">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="lblLanguage">
            <property name="text">
@@ -256,7 +312,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="4" column="0">
        <widget class="QFrame" name="frameServer">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -265,6 +321,18 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QFormLayout" name="formLayout_6">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="lblServer">
            <property name="text">
@@ -277,6 +345,11 @@
            <item>
             <property name="text">
              <string>eros.starbowmod.com</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>localhost</string>
             </property>
            </item>
           </widget>

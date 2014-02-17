@@ -4,6 +4,12 @@
     <file alias="portrait_1">res/img/portraits/1.png</file>
     <file alias="portrait_2">res/img/portraits/2.png</file>
   </qresource>
+  <qresource prefix="/font">
+    <file alias="NotoSans-Bold">res/font/NotoSans-Bold.ttf</file>
+    <file alias="NoyoSans-BoldItalic">res/font/NotoSans-BoldItalic.ttf</file>
+    <file alias="NotoSans-Italic">res/font/NotoSans-Italic.ttf</file>
+    <file alias="NotoSans-Regular">res/font/NotoSans-Regular.ttf</file>
+  </qresource>
   <qresource prefix="/img/client/rank_icons">
     <file alias="league_1">res/img/client/large_icons/league_1.png</file>
     <file alias="league_2">res/img/client/large_icons/league_2.png</file>
@@ -16,6 +22,7 @@
     <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
   </qresource>
   <qresource prefix="/img/client/icons">
+    <file alias="cog">res/img/client/icons/cog.png</file>
     <file alias="bow">res/img/client/icons/bow.png</file>
     <file alias="league_1">res/img/client/icons/league_1.png</file>
     <file alias="league_2">res/img/client/icons/league_2.png</file>

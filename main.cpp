@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 	Eros *eros = new Eros(0);
 	QThread *erosThread = new QThread();
 	eros->moveToThread(erosThread);
+	erosThread->start();
 
 	MainWindow w(eros, 0);
 	w.show();

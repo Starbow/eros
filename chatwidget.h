@@ -14,10 +14,16 @@ public:
 	ChatWidget(Eros *eros, ChatRoom *chatroom, QWidget *parent = 0);
 	~ChatWidget();
 
+	void setChatroom(ChatRoom *chatroom);
+	void setUser(User *user);
+
+	User *user() const;
+	ChatRoom *chatroom() const;
+
 private:
 	Ui::ChatWidget ui;
-	ChatRoom *chatroom;
-	User *user;
+	ChatRoom *chatroom_;
+	User *user_;
 
 	void addUser(User *user);
 	void removeUser(User *user);

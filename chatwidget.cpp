@@ -6,8 +6,7 @@ ChatWidget::ChatWidget(Eros *eros, User *user, QWidget *parent)
 	:QWidget(parent)
 {
 	ui.setupUi(this);
-	this->user = user;
-	this->chatroom = nullptr;
+	setUser(user);
 
 	// We don't need the user list
 	ui.listUsers->hide();
@@ -25,8 +24,7 @@ ChatWidget::ChatWidget(Eros *eros, ChatRoom *chatroom, QWidget *parent)
 	:QWidget(parent)
 {
 	ui.setupUi(this);
-	this->user = nullptr;
-	this->chatroom = chatroom;
+	setChatroom(chatroom);
 
 	QObject::connect(eros, SIGNAL(chatMessageSent(ChatRoom*, const QString)), this, SLOT( chatMessageSent(ChatRoom*, const QString)));
 	QObject::connect(eros, SIGNAL(chatMessageReceieved(ChatRoom*, User*, const QString)), this, SLOT( chatMessageReceieved(ChatRoom*, User*, const QString)));
@@ -49,6 +47,26 @@ ChatWidget::ChatWidget(Eros *eros, ChatRoom *chatroom, QWidget *parent)
 ChatWidget::~ChatWidget()
 {
 
+}
+
+ChatRoom *ChatWidget::chatroom() const
+{
+	return this->chatroom_;
+}
+
+User *ChatWidget::user() const
+{
+	return this->user_;
+}
+void ChatWidget::setChatroom(ChatRoom *chatroom)
+{
+	this->chatroom_ = chatroom;
+	this->user_ = nullptr;
+}
+void ChatWidget::setUser(User *user)
+{
+	this->user_ = user;
+	this->chatroom_ = nullptr;
 }
 
 void ChatWidget::addUser(User *user)
@@ -75,11 +93,11 @@ void ChatWidget::sendMessagePressed()
 
 	if (!message.isEmpty())
 	{
-		if (this->user != nullptr)
-			emit sendMessage(this->user, message);
+		if (this->user_ != nullptr)
+			emit sendMessage(this->user_, message);
 		
-		if (this->chatroom != nullptr)
-			emit sendMessage(this->chatroom, message);
+		if (this->chatroom_ != nullptr)
+			emit sendMessage(this->chatroom_, message);
 
 		//writeLog(QString("%1: %2").arg( "Me" , message ));
 	}
@@ -89,39 +107,39 @@ void ChatWidget::sendMessagePressed()
 
 void ChatWidget::chatRoomUserJoined(ChatRoom *room, User *user)
 {
-	if (room == this->chatroom)
+	if (room == this->chatroom_)
 		addUser(user);
 }
 void ChatWidget::chatRoomUserLeft(ChatRoom *room, User *user)
 {
-	if (room == this->chatroom)
+	if (room == this->chatroom_)
 		removeUser(user);
 }
 
 
 void ChatWidget::chatMessageSent(ChatRoom *room, const QString message)
 {
-	if (room == this->chatroom)
+	if (room == this->chatroom_)
 		return;
 	//printf("Your message \"%s\" in chatroom: %s was sent successfully\n", message.toStdString().c_str(), room->name().toStdString().c_str());
 }
 
 void ChatWidget::chatMessageReceieved(ChatRoom *room, User *user, const QString message)
 {
-	if (room == this->chatroom)
+	if (room == this->chatroom_)
 		writeLog(QString("%1: %2").arg( user->username() , message ));
 }
 
 void ChatWidget::chatMessageReceieved(User *user, const QString message)
 {
-	if (this->user == user)
+	if (this->user_ == user)
 		writeLog(QString("%1: %2").arg( user->username() , message ));
 }
 
 
 void ChatWidget::chatMessageSent(User *user, const QString message)
 {
-	if (this->user == user)
+	if (this->user_ == user)
 		writeLog(QString("%1: %2").arg( user->username() , message ));
 }
 
@@ -129,13 +147,13 @@ void ChatWidget::chatMessageSent(User *user, const QString message)
 
 void ChatWidget::chatMessageFailed(ChatRoom *room, const QString message, ErosError code)
 {
-	if (this->chatroom == room)
+	if (this->chatroom_ == room)
 		writeLog(QString("Chat Message \"%1\" failed.").arg(message));
 
 }
 
 void ChatWidget::chatMessageFailed(User *user, const QString message, ErosError code)
 {
-	if (this->user == user)
+	if (this->user_ == user)
 		writeLog(QString("Chat message \"%1\" failed.").arg(user->username()));
 }
