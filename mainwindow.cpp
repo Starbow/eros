@@ -173,7 +173,7 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 	ui.frmMatchmakingOpponent->layout()->addWidget(region_info);
 
 	ui.lblVS->setText("VS");
-	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
+	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a> (join SC2 channel %4)").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName(), match->battleNetChannel());
 	ui.lblMapInfo->setText(map);
 }
 
@@ -501,7 +501,7 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 		{
 			int regionIndex = ui.cmbRegion->currentData().toInt();
 			ErosRegion region = eros_->activeRegions()[regionIndex];
-			widget->writeLog(tr("You have been automatically joined to this chat room for your match against <strong>%1</strong> on <a href=\"starcraft://map/%2/%3\">%4</a>. GLHF!").arg(match->opponent()->username(), QString::number((int)region), QString::number(match->mapId()), match->mapName()), false); 
+			widget->writeLog(tr("You have been automatically joined to this chat room for your match against <strong>%1</strong> on <a href=\"starcraft://map/%2/%3\">%4</a>. We suggest joining the channel <strong>%5</strong> on Battle.net. GLHF!").arg(match->opponent()->username(), QString::number((int)region), QString::number(match->mapId()), match->mapName(), match->battleNetChannel()), false); 
 		}
 	}
 	ui.tabContainer->setCurrentIndex(id);
