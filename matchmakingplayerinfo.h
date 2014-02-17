@@ -10,7 +10,7 @@ class MatchmakingPlayerInfo : public QWidget
 	Q_OBJECT
 
 public:
-	MatchmakingPlayerInfo(const QString &username, const QString &division, const UserLadderStats *stats, QWidget *parent = 0);
+	MatchmakingPlayerInfo(const QString &username, const QString &division, const UserLadderStats *stats, bool flipped = false, QWidget *parent = 0);
 	~MatchmakingPlayerInfo();
 
 private:

@@ -24,6 +24,10 @@ public:
 
 private slots:
 
+	// Config slots
+
+	//void activeProfileChanged(Profile *profile);
+
 	// UI Slots
 	void label_linkActivated(const QString &link);
 	void tabContainer_tabCloseRequested(int index);
@@ -55,6 +59,7 @@ private slots:
 	// Matchmaking
 	void erosMatchmakingStateChanged(ErosMatchmakingState status);
 	void erosMatchmakingMatchFound(MatchmakingMatch *match);
+	void erosRegionStatsUpdated(ErosRegion region, int searching);
 
 signals:
 	// Connectivity slots

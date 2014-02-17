@@ -49,7 +49,12 @@ bool Config::startOnLogin() const
 
 void Config::setActiveProfile(Profile * profile)
 {
-	this->active_profile_ = profile;
+	if (this->active_profile_ != profile)
+	{
+		this->active_profile_ = profile;
+		emit activeProfileChanged(profile);
+	}
+	
 }
 void Config::setStartOnLogin(bool start)
 {

@@ -32,6 +32,9 @@ private:
 	bool start_on_login_;
 	QSettings *settings_;
 
+signals:
+	void activeProfileChanged(Profile *profile);
+
 };
 
 #endif // EROS_CONFIG_H

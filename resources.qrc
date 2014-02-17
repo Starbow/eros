@@ -5,6 +5,8 @@
     <file alias="portrait_2">res/img/portraits/2.png</file>
   </qresource>
   <qresource prefix="/font">
+    <file alias="Gobold-bold">res/font/Gobold Bold.ttf</file>
+    <file alias="Gobold">res/font/Gobold.ttf</file>
     <file alias="NotoSans-Bold">res/font/NotoSans-Bold.ttf</file>
     <file alias="NoyoSans-BoldItalic">res/font/NotoSans-BoldItalic.ttf</file>
     <file alias="NotoSans-Italic">res/font/NotoSans-Italic.ttf</file>
@@ -20,8 +22,11 @@
   <qresource prefix="/img/client">
     <file alias="logo">res/img/client/logo.png</file>
     <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
+    <file alias="search">res/img/client/search.png</file>
   </qresource>
   <qresource prefix="/img/client/icons">
+    <file alias="private_chat">res/img/client/icons/privatechat.png</file>
+    <file alias="public_chat">res/img/client/icons/publicchat.png</file>
     <file alias="cog">res/img/client/icons/cog.png</file>
     <file alias="bow">res/img/client/icons/bow.png</file>
     <file alias="league_1">res/img/client/icons/league_1.png</file>

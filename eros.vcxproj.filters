@@ -95,6 +95,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_matchmakingplayerinfo.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="matchmakingsearchprogresswidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_matchmakingsearchprogresswidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_matchmakingsearchprogresswidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -130,6 +139,12 @@
     <CustomBuild Include="matchmakingplayerinfo.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="matchmakingsearchprogresswidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="matchmakingsearchprogresswidget.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_mainwindow.h">
@@ -145,6 +160,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_matchmakingplayerinfo.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_matchmakingsearchprogresswidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include "chatwidget.h"
 #include "matchmakingplayerinfo.h"
+#include "matchmakingsearchprogresswidget.h"
 
 
 MainWindow::MainWindow(Eros *eros, QWidget *parent )
@@ -16,6 +17,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QFontDatabase::addApplicationFont(":/font/NotoSans-Bold");
 	QFontDatabase::addApplicationFont(":/font/NotoSans-Italic");
 	QFontDatabase::addApplicationFont(":/font/NotoSans-BoldItalic");
+	QFontDatabase::addApplicationFont(":/font/Gobold");
+	QFontDatabase::addApplicationFont(":/font/Gobold-bold");
 
 	ui.setupUi(this);
 	delete ui.lblLocalPlaceholder;
@@ -26,7 +29,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->config_ = new Config(this);
 	this->connection_timer_ = new QTimer(this);
 	this->matchmaking_timer_ = new QTimer(this);
-	this->matchmaking_timer_->setInterval(1000);
+	this->matchmaking_timer_->setInterval(500);
 	this->matchmaking_start_ = new QTime();
 
 	// The user should be prevented from emptying invalid values in the settings dialog.
@@ -38,8 +41,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 		delete settings_window_;
 	}
 
-	// Connection timer
+	// timers
 	QObject::connect(this->connection_timer_, SIGNAL(timeout()), this, SLOT(connectionTimerWorker()));
+	QObject::connect(this->matchmaking_timer_, SIGNAL(timeout()), this, SLOT(matchmakingTimerWorker()));
 
 	// Set up Eros signals
 	/// Eros Signals
@@ -52,16 +56,18 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(localUserUpdated(LocalUser*)), this, SLOT(erosLocalUserUpdated(LocalUser*)));
 	QObject::connect(eros_, SIGNAL(matchmakingStateChanged(ErosMatchmakingState)), this, SLOT(erosMatchmakingStateChanged(ErosMatchmakingState)));
 	QObject::connect(eros_, SIGNAL(matchmakingMatchFound(MatchmakingMatch *)), this, SLOT(erosMatchmakingMatchFound(MatchmakingMatch *)));
+	QObject::connect(eros_, SIGNAL(regionStatsUpdated(ErosRegion, int)), this, SLOT(erosRegionStatsUpdated(ErosRegion, int)));
 
 	/// Eros Slots
 	QObject::connect(this, SIGNAL(connectToEros(const QString, const QString, const QString)), eros_, SLOT(connectToEros(const QString, const QString, const QString)));
+	QObject::connect(this, SIGNAL(disconnectFromEros()), eros_, SLOT(disconnectFromEros()));
 	QObject::connect(ui.btnRefreshChats, SIGNAL(pressed()), eros_, SLOT(refreshChatRooms()));
 	QObject::connect(this, SIGNAL(joinChatRoom(ChatRoom *, const QString)), eros_, SLOT(joinChatRoom(ChatRoom *, const QString)));
 	QObject::connect(this, SIGNAL(leaveChatRoom(ChatRoom *)), eros_, SLOT(leaveChatRoom(ChatRoom *)));
 
 	QObject::connect(this, SIGNAL(queueMatchmaking(ErosRegion, int)), eros_, SLOT(queueMatchmaking(ErosRegion, int)));
 	QObject::connect(this, SIGNAL(dequeueMatchmaking()), eros_, SLOT(dequeueMatchmaking()));
-
+	
 
 
 	// UI Stuff
@@ -90,6 +96,17 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::erosRegionStatsUpdated(ErosRegion region, int count)
+{
+	int regionIndex = ui.cmbRegion->currentData().toInt();
+	ErosRegion current_region = eros_->activeRegions()[regionIndex];
+
+	if (current_region == region)
+	{
+		ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(count));
+	}
+}
+
 void MainWindow::erosMatchmakingStateChanged(ErosMatchmakingState status)
 {
 	switch (status)
@@ -100,36 +117,77 @@ void MainWindow::erosMatchmakingStateChanged(ErosMatchmakingState status)
 	case ErosMatchmakingState::Aborted:
 	case ErosMatchmakingState::Idle:
 		setQueueState(false);
+		break;
 	case ErosMatchmakingState::InvalidRegion:
+		setQueueState(false);
 		QMessageBox::warning(this, tr("Eros Matchmaking"), tr("Your queue was aborted because you do not have any verified StarCraft 2 profiles for the selected region."));
 		break;
 	}
 }
 void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 {
+	int regionIndex = ui.cmbRegion->currentData().toInt();
+	ErosRegion region = eros_->activeRegions()[regionIndex];
+
+	QLayoutItem* item;
+	while ( ( item = ui.frmMatchmakingOpponent->layout()->takeAt(0)) != NULL )
+	{
+		delete item->widget();
+		delete item;
+	}
+
+	UserLadderStats *stats = match->opponent()->ladderStats()[region];
+	const QPair<int, QString> &region_division = eros_->divisions()->division(stats->points());
+
+	MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(match->opponent()->username(), region_division.second, stats, true, this);
+	ui.frmMatchmakingOpponent->layout()->addWidget(region_info);
 
 }
 
 void MainWindow::matchmakingTimerWorker()
 {
-	int time = this->matchmaking_start_->elapsed();
-	ui.btnQueue->setText(QString(time));
+
+	int secs = this->matchmaking_start_->elapsed()  / 1000;
+	int mins = (secs / 60) % 60;
+	secs = secs - (mins * 60);
+	ui.btnQueue->setText(QString("Queued (%1:%2)").arg(mins,2, 10, QLatin1Char('0')).arg(secs,2,10,QLatin1Char('0')));
 }
 
 void MainWindow::setQueueState(bool queueing)
 {
 	if (queueing)
 	{
+		ui.btnQueue->setText(tr("Queued"));
 		ui.cmbRegion->setEnabled(false);
 		this->matchmaking_start_->restart();
 		this->matchmaking_timer_->start();
+
+
+		MatchmakingSearchProgressWidget *search = new MatchmakingSearchProgressWidget(this);
+		ui.frmMatchmakingOpponent->layout()->addWidget(search);
+		ui.lblVS->setMaximumHeight(16777215);
+
 	}
 	else
 	{
 		this->matchmaking_timer_->stop();
 		ui.cmbRegion->setEnabled(true);
 		ui.btnQueue->setText(tr("Queue"));
+		QLayoutItem* item;
+		while ( ( item = ui.frmMatchmakingOpponent->layout()->takeAt(0)) != NULL )
+		{
+			delete item->widget();
+			delete item;
+		}
+		while ( ( item = ui.frmMatchmakingOpponent->layout()->takeAt(0)) != NULL )
+		{
+			delete item->widget();
+			delete item;
+		}
+		ui.lblVS->setMaximumHeight(0);
+		
 	}
+	ui.btnQueue->setEnabled(true);
 }
 
 void MainWindow::btnQueue_pressed()
@@ -145,6 +203,7 @@ void MainWindow::btnQueue_pressed()
 			int regionIndex = ui.cmbRegion->currentData().toInt();
 			ErosRegion region = eros_->activeRegions()[regionIndex];
 			emit queueMatchmaking(region, this->config_->activeProfile()->searchRange());
+			ui.btnQueue->setEnabled(false);
 		}
 	}
 }
@@ -161,17 +220,17 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 		UserLadderStats *stats = user->ladderStats()[region];
 		const QPair<int, QString> &region_division = eros_->divisions()->division(stats->points());
 		QLayoutItem* item;
-		while ( ( item = ui.frmMatchmakingLocal->layout()->takeAt(0)) != NULL )
+		while ( ( item = ui.frmLocalInfo->layout()->takeAt(0)) != NULL )
 		{
 			delete item->widget();
 			delete item;
 		}
-		MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(user->username(), region_division.second, stats, this);
-		ui.frmMatchmakingLocal->layout()->addWidget(region_info);
+		MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(user->username(), region_division.second, stats, false, this);
+		ui.frmLocalInfo->layout()->addWidget(region_info);
 
 	}
 
-	ui.lblRegionStats->setText(tr("%1 people are currently queueing on this region. Time to peace out some motherfuckers.").arg(eros_->regionSearchingUserCount(region)));
+	ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(eros_->regionSearchingUserCount(region)));
 }
 
 void MainWindow::erosConnected()
@@ -192,6 +251,7 @@ void MainWindow::erosConnected()
 void MainWindow::erosDisconnected()
 {
 	setUiEnabled(false);
+	setQueueState(false);
 }
 
 void MainWindow::erosLocalUserUpdated(LocalUser *user)
@@ -202,6 +262,7 @@ void MainWindow::erosLocalUserUpdated(LocalUser *user)
 // Handle updating the status label and toggling the connection timer.
 void MainWindow::erosStateChanged(ErosState state)
 {
+	setQueueState(false);
 	switch (state)
 	{
 	case ErosState::ConnectingState:
@@ -291,6 +352,15 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 			ui.tabContainer->removeTab(index);
 			delete this->settings_window_;
 			this->settings_window_ = nullptr;
+
+			if (this->eros_->state() == ErosState::ConnectedState)
+			{
+				if (this->eros_->localUser()->username().toLower().trimmed() != this->config_->activeProfile()->username().toLower().trimmed())
+				{
+					emit disconnectFromEros();
+					QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
+				}
+			}
 		}
 	}
 	else if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
@@ -347,7 +417,7 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 	}
 
 	ChatWidget *widget = new ChatWidget(this->eros_, room);
-	int id = ui.tabContainer->addTab(widget, room->name());
+	int id = ui.tabContainer->addTab(widget, QIcon(":/img/client/icons/public_chat"), room->name());
 	ui.tabContainer->setCurrentIndex(id);
 }
 void MainWindow::erosChatRoomLeft(ChatRoom *room)

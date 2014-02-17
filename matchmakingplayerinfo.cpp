@@ -1,6 +1,6 @@
 #include "matchmakingplayerinfo.h"
-
-MatchmakingPlayerInfo::MatchmakingPlayerInfo(const QString &username, const QString &division, const UserLadderStats *stats, QWidget *parent)
+#include <QLayoutItem>
+MatchmakingPlayerInfo::MatchmakingPlayerInfo(const QString &username, const QString &division, const UserLadderStats *stats, bool flipped, QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
@@ -23,6 +23,12 @@ MatchmakingPlayerInfo::MatchmakingPlayerInfo(const QString &username, const QStr
 	ui.lblLocalPlayerLeagueImage->setPixmap(QPixmap(QString(":/img/client/rank_icons/league_%1").arg(league)));
 
 	ui.lblPlayerName->setText(username);
+
+	if (flipped) 
+	{
+		QLayoutItem* item = ui.gridLayout->takeAt(0);
+		ui.gridLayout->addWidget(item->widget(), 3, 0, Qt::AlignHCenter|Qt::AlignTop);
+	}
 }
 
 MatchmakingPlayerInfo::~MatchmakingPlayerInfo()
