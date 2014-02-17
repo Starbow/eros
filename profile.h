@@ -15,6 +15,7 @@ public:
 	const QString &username() const;
 	const QString &token() const;
 	const QString &language() const;
+	const QString &replayFolder() const;
 	bool chatLinks() const;
 	int searchRange() const;
 
@@ -23,6 +24,7 @@ public:
 	void setLanguage(const QString &);
 	void setChatLinks(bool);
 	void setSearchRange(int);
+	void setReplayFolder(const QString &);
 
 	void save();
 
@@ -33,6 +35,7 @@ private:
 	QString token_;
 	bool chat_links_;
 	QString language_;
+	QString replay_folder_;
 	int search_range_;	
 };
 

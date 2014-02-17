@@ -1,4 +1,5 @@
 #include "profile.h"
+#include <QStandardPaths>
 
 Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 	: QObject(parent)
@@ -12,6 +13,7 @@ Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 		this->chat_links_ = settings->value("chatlinks", true).toBool();
 		this->language_ = settings->value("language", "English").toString();
 		this->search_range_ = settings->value("searchrange", 1).toInt();
+		this->replay_folder_ = settings->value("replayfolder", "").toString();
 	}
 	else
 	{
@@ -20,6 +22,10 @@ Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 		this->chat_links_ = true;
 		this->language_ = "";
 		this->search_range_ = 1;
+		this->replay_folder_ = "";
+#ifdef WIN32
+		this->replay_folder_ = QStandardPaths::locate(QStandardPaths::DocumentsLocation, "StarCraft II", QStandardPaths::LocateDirectory);
+#endif
 	}
 }
 
@@ -35,10 +41,15 @@ void Profile::save()
 	settings_->setValue("language", this->language_);
 	settings_->setValue("chatlinks", this->chat_links_);
 	settings_->setValue("searchrange", this->search_range_);
+	settings_->setValue("replayfolder", this->replay_folder_);
 }
 const QString &Profile::username() const
 {
 	return this->username_;
+}
+const QString &Profile::replayFolder() const
+{
+	return this->replay_folder_;
 }
 const QString &Profile::token() const
 {
@@ -64,6 +75,10 @@ void Profile::setUsername(const QString & username)
 void Profile::setToken(const QString &token)
 {
 	this->token_ = token;
+}
+void Profile::setReplayFolder(const QString &folder)
+{
+	this->replay_folder_ = folder;
 }
 void Profile::setLanguage(const QString &language)
 {

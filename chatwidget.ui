@@ -17,11 +17,14 @@
    <item>
     <layout class="QHBoxLayout" name="layoutInformation">
      <item>
-      <widget class="QTextEdit" name="txtMessages">
+      <widget class="QTextBrowser" name="txtMessages">
        <property name="tabChangesFocus">
         <bool>true</bool>
        </property>
        <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="openExternalLinks">
         <bool>true</bool>
        </property>
       </widget>

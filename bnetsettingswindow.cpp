@@ -162,15 +162,15 @@ void BnetSettingsWindow::erosCharacterRemoved(Character* character)
 }
 void BnetSettingsWindow::erosAddCharacterError(const QString battle_net_profile, ErosError error)
 {
-	QMessageBox::warning(this, tr("Error Adding Character"), tr("The Battle.net profile \"%1\" could not be added.\nError %2: %3.").arg(battle_net_profile, QString::number((int)error), Eros::errorString(error)));
+	QMessageBox::warning(this, tr("Error Adding Character"), tr("The Battle.net profile \"%1\" could not be added.\nError %2: %3").arg(battle_net_profile, QString::number((int)error), Eros::errorString(error)));
 }
 void BnetSettingsWindow::erosUpdateCharacterError(Character* character, ErosError error)
 {
-	QMessageBox::warning(this, tr("Error Updating Character"), tr("The Battle.net profile \"%1\" could not be updated.\nError %2: %3.").arg(character->displayName(), QString::number((int)error), Eros::errorString(error)));
+	QMessageBox::warning(this, tr("Error Updating Character"), tr("The Battle.net profile \"%1\" could not be updated.\nError %2: %3").arg(character->displayName(), QString::number((int)error), Eros::errorString(error)));
 }
 void BnetSettingsWindow::erosRemoveCharacterError(Character* character, ErosError error)
 {
-	QMessageBox::warning(this, tr("Error Removing Character"), tr("The Battle.net profile \"%1\" could not be removed.\nError %2: %3.").arg(character->displayName(), QString::number((int)error), Eros::errorString(error)));
+	QMessageBox::warning(this, tr("Error Removing Character"), tr("The Battle.net profile \"%1\" could not be removed.\nError %2: %3").arg(character->displayName(), QString::number((int)error), Eros::errorString(error)));
 }
 
 

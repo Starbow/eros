@@ -25,6 +25,8 @@
     <file alias="search">res/img/client/search.png</file>
   </qresource>
   <qresource prefix="/img/client/icons">
+    <file alias="match_chat">res/img/client/icons/selected matchchat.png</file>
+    <file alias="padlock">res/img/client/icons/padlock.png</file>
     <file alias="private_chat">res/img/client/icons/privatechat.png</file>
     <file alias="public_chat">res/img/client/icons/publicchat.png</file>
     <file alias="cog">res/img/client/icons/cog.png</file>

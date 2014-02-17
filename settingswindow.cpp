@@ -1,5 +1,5 @@
 #include "settingswindow.h"
-
+#include <QFileDialog>
 SettingsWindow::SettingsWindow(QWidget *parent, Config *cfg)
 	: QDialog(parent)
 {
@@ -168,11 +168,12 @@ void SettingsWindow::reconnectGUI()
 	this->connect(ui.btnDeleteProfile,  SIGNAL(clicked()), this, SLOT(btnDeleteProfile_click()));
 //	this->connect(ui.btnOK,             SIGNAL(clicked()), this, SLOT(btnOK_click()));
 	this->connect(ui.btnSetToken,       SIGNAL(clicked()), this, SLOT(btnSetToken_click()));
+	this->connect(ui.btnSelectWatchFolder,       SIGNAL(clicked()), this, SLOT(btnSelectWatchFolder_click()));
 	this->connect(ui.cmbSearchRange,    SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbSearchRange_changed()));
 	this->connect(ui.cmbAutostart,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbAutostart_changed()));
 	this->connect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->connect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
-	this->connect(ui.btnBnetAccounts,SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
+	this->connect(ui.btnBnetAccounts,	SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
 }
 
 bool SettingsWindow::profileExists(QString profileName)
@@ -189,15 +190,24 @@ bool SettingsWindow::profileExists(QString profileName)
 
 void SettingsWindow::disableProfileInterface()
 {
+	
 	ui.lblProfile->setDisabled(true);
 	ui.btnDeleteProfile->setDisabled(true);
 	ui.btnSetToken->setDisabled(true);
 
+	/*
 	ui.cmbProfiles->setDisabled(true);
 	ui.cmbSearchRange->setDisabled(true);
 	ui.cmbAutostart->setDisabled(true);
 	ui.cmbChatLinks->setDisabled(true);
 	ui.cmbLanguage->setDisabled(true);	
+	
+	ui.lblSearchRange->setDisabled(true);
+	ui.lblAutostart->setDisabled(true);
+	ui.lblChatLinks->setDisabled(true);
+	ui.lblLanguage->setDisabled(true);	
+	*/
+	ui.gbSettings->setEnabled(false);
 
 	ui.cmbProfiles->setCurrentIndex(-1);
 	ui.cmbSearchRange->setCurrentIndex(-1);
@@ -213,11 +223,6 @@ void SettingsWindow::disableProfileInterface()
 	
 	ui.cmbProfiles->clear();
 
-	//disable option labels
-	ui.lblSearchRange->setDisabled(true);
-	ui.lblAutostart->setDisabled(true);
-	ui.lblChatLinks->setDisabled(true);
-	ui.lblLanguage->setDisabled(true);	
 
 	//stuff withbnet
 	ui.btnBnetAccounts->setDisabled(true);
@@ -230,6 +235,7 @@ void SettingsWindow::enableProfileInterface()
 	ui.btnDeleteProfile->setEnabled(true);
 	ui.btnSetToken->setEnabled(true);
 
+	/*
 	//enable comboboxes
 	ui.cmbProfiles->setEnabled(true);
 	ui.cmbSearchRange->setEnabled(true);
@@ -241,7 +247,8 @@ void SettingsWindow::enableProfileInterface()
 	ui.lblSearchRange->setEnabled(true);
 	ui.lblAutostart->setEnabled(true);
 	ui.lblChatLinks->setEnabled(true);
-	ui.lblLanguage->setEnabled(true);
+	ui.lblLanguage->setEnabled(true);*/
+	ui.gbSettings->setEnabled(true);
 
 	//stuff withbnet
 	ui.btnBnetAccounts->setEnabled(true);
@@ -262,6 +269,7 @@ void SettingsWindow::refreshProfileInterface()
 	ui.cmbAutostart->setCurrentIndex(ui.cmbAutostart->findText(boolToYesNo(config_->startOnLogin())));
 	ui.cmbChatLinks->setCurrentIndex(ui.cmbChatLinks->findText(boolToYesNo(this->config_->activeProfile()->chatLinks())));
 	ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findText(this->config_->activeProfile()->language()));
+	ui.txtWatchFolder->setText(this->config_->activeProfile()->replayFolder());
 }
 
 const short int SettingsWindow::searchRangeToInt(QString searchRange)
@@ -316,3 +324,12 @@ const QString SettingsWindow::boolToYesNo(bool yesno)
 	}
 }
 
+void SettingsWindow::btnSelectWatchFolder_click()
+{
+	QString directory = QFileDialog::getExistingDirectory(this, "Select Folder", this->config_->activeProfile()->replayFolder());
+	if (!directory.isEmpty() && !directory.isNull())
+	{
+		this->config_->activeProfile()->setReplayFolder(directory);
+		ui.txtWatchFolder->setText(directory);
+	}
+}

@@ -1,6 +1,7 @@
 #include "chatwidget.h"
 
 #include <QScrollBar>
+#include <QTime>
 
 ChatWidget::ChatWidget(Eros *eros, User *user, QWidget *parent)
 	:QWidget(parent)
@@ -81,9 +82,11 @@ void ChatWidget::removeUser(User *user)
 	qDeleteAll(this->ui.listUsers->findItems(user->username(), Qt::MatchFlag::MatchExactly));
 }
 
-void ChatWidget::writeLog(const QString &data) 
+void ChatWidget::writeLog(const QString &data, bool sanitize) 
 {	
-    ui.txtMessages->append(data);
+
+	
+	ui.txtMessages->append(QString("[%1] %2").arg(QTime::currentTime().toString("HH:mm:ss"), sanitize ? data.toHtmlEscaped() : data));
     ui.txtMessages->verticalScrollBar()->setValue(ui.txtMessages->verticalScrollBar()->maximum());
 }
 

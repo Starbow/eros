@@ -1,6 +1,6 @@
 #include "config.h"
 
-#define EROS_DEFAULT_SERVER "eros.starbowmod.com"
+#define EROS_DEFAULT_SERVER "54.196.216.131"
 
 Config::Config(QObject *parent)
 	: QObject(parent)

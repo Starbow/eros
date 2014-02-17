@@ -27,6 +27,7 @@ private slots:
 	void cmbProfiles_changed();
 	void btnOK_click();
 	void btnSetToken_click();
+	void btnSelectWatchFolder_click();
 
 	//creates a new user profile (not actually saved to file until btnOK_click())
 	void btnNewProfile_click();
@@ -56,6 +57,7 @@ private:
 	const QString intToSearchRange(const short int searchRange);
 	
 	const QString boolToYesNo(bool yesno);
+
 };
 
 #endif // EROS_SETTINGSWINDOW_H

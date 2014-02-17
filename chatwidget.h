@@ -19,6 +19,7 @@ public:
 
 	User *user() const;
 	ChatRoom *chatroom() const;
+	void writeLog(const QString &data, bool sanitize = true);
 
 private:
 	Ui::ChatWidget ui;
@@ -27,7 +28,7 @@ private:
 
 	void addUser(User *user);
 	void removeUser(User *user);
-	void writeLog(const QString &data);
+	
 
 private slots:
 	

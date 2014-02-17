@@ -4,13 +4,15 @@
 #include <QtWidgets/QMainWindow>
 #include <QSettings>
 #include <QTimer>
+#include <QTime>
+#include <QTimer>
+#include <qsimplefilewatcher.h>
 
 #include "config.h"
 #include "settingswindow.h"
 #include "ui_mainwindow.h"
 #include "../liberos/eros.h"
-#include <QTime>
-#include <QTimer>
+
 
 class MainWindow : public QMainWindow
 {
@@ -56,10 +58,16 @@ private slots:
 
 	void erosLocalUserUpdated(LocalUser *user);
 
+	void refreshChatRoomList();
+
 	// Matchmaking
 	void erosMatchmakingStateChanged(ErosMatchmakingState status);
 	void erosMatchmakingMatchFound(MatchmakingMatch *match);
 	void erosRegionStatsUpdated(ErosRegion region, int searching);
+	void erosReplayUploaded();
+	void erosReplayUploadError(ErosError error);
+	void erosUploadProgress(qint64 written, qint64 total);
+	void fileAction(WatchID watchId, const QString &dir, const QString &filename, Action action);
 
 signals:
 	// Connectivity slots
@@ -101,6 +109,13 @@ private:
 	QString username_;
 	QString authtoken_;
 	QString server_;
+	QSimpleFileWatcher *watcher_;
+	QList<WatchID> watches_;
+
+
+	void clearWatches();
+	void setupWatches();
+	void addWatch(const QString &);
 
 	
 };

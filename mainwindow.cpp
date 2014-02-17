@@ -4,6 +4,8 @@
 #include <QLocale>
 #include <QFontDatabase>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QStandardPaths>
 #include "chatwidget.h"
 #include "matchmakingplayerinfo.h"
 #include "matchmakingsearchprogresswidget.h"
@@ -31,6 +33,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->matchmaking_timer_ = new QTimer(this);
 	this->matchmaking_timer_->setInterval(500);
 	this->matchmaking_start_ = new QTime();
+	this->watcher_ = new QSimpleFileWatcher(this);
+	this->watches_ = QList<WatchID>();
 
 	// The user should be prevented from emptying invalid values in the settings dialog.
 	if (this->config_->profiles().count() == 0)
@@ -45,6 +49,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this->connection_timer_, SIGNAL(timeout()), this, SLOT(connectionTimerWorker()));
 	QObject::connect(this->matchmaking_timer_, SIGNAL(timeout()), this, SLOT(matchmakingTimerWorker()));
 
+	// File watcher
+	QObject::connect(this->watcher_, SIGNAL(fileAction(WatchID, const QString &, const QString &, Action )), this, SLOT(fileAction(WatchID, const QString &, const QString, Action)));
+
 	// Set up Eros signals
 	/// Eros Signals
 	QObject::connect(eros_, SIGNAL(stateChanged(ErosState)), this, SLOT(erosStateChanged(ErosState)));
@@ -57,6 +64,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(matchmakingStateChanged(ErosMatchmakingState)), this, SLOT(erosMatchmakingStateChanged(ErosMatchmakingState)));
 	QObject::connect(eros_, SIGNAL(matchmakingMatchFound(MatchmakingMatch *)), this, SLOT(erosMatchmakingMatchFound(MatchmakingMatch *)));
 	QObject::connect(eros_, SIGNAL(regionStatsUpdated(ErosRegion, int)), this, SLOT(erosRegionStatsUpdated(ErosRegion, int)));
+	QObject::connect(eros_, SIGNAL(replayUploadError(ErosError)), this, SLOT(erosReplayUploadError(ErosError)));
+	QObject::connect(eros_, SIGNAL(replayUploaded()), this, SLOT(erosReplayUploaded()));
+	QObject::connect(eros_, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(erosUploadProgress(qint64, qint64)));
 
 	/// Eros Slots
 	QObject::connect(this, SIGNAL(connectToEros(const QString, const QString, const QString)), eros_, SLOT(connectToEros(const QString, const QString, const QString)));
@@ -67,7 +77,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 
 	QObject::connect(this, SIGNAL(queueMatchmaking(ErosRegion, int)), eros_, SLOT(queueMatchmaking(ErosRegion, int)));
 	QObject::connect(this, SIGNAL(dequeueMatchmaking()), eros_, SLOT(dequeueMatchmaking()));
-	
+	QObject::connect(this, SIGNAL(uploadReplay(QIODevice*)), eros_, SLOT(uploadReplay(QIODevice*)));
+	QObject::connect(this, SIGNAL(uploadReplay(const QString)), eros_, SLOT(uploadReplay(const QString)));
 
 
 	
@@ -88,6 +99,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(ui.lstChats, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(lstChats_currentItemChanged(QListWidgetItem *, QListWidgetItem *)));
 	QObject::connect(ui.cmbRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbRegion_currentIndexChanged(int)));
 	QObject::connect(ui.btnQueue, SIGNAL(pressed()), this, SLOT(btnQueue_pressed()));
+	
 
 	this->connection_timer_->setInterval(500);
 	this->connection_timer_->start();
@@ -97,6 +109,20 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::refreshChatRoomList()
+{
+	if (this->eros_->state() == ErosState::ConnectedState)
+	{
+		ui.lstChats->clear();
+		for (int i =0; i < this->eros_->chatRooms().count(); i++)
+		{
+			ui.lstChats->addItem(this->eros_->chatRooms()[i]->name());
+		}
+
+		ui.lstChats->sortItems();
+	}
 }
 
 void MainWindow::erosRegionStatsUpdated(ErosRegion region, int count)
@@ -129,6 +155,7 @@ void MainWindow::erosMatchmakingStateChanged(ErosMatchmakingState status)
 }
 void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 {
+	this->matchmaking_timer_->stop();
 	int regionIndex = ui.cmbRegion->currentData().toInt();
 	ErosRegion region = eros_->activeRegions()[regionIndex];
 
@@ -145,6 +172,9 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 	MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(match->opponent()->username(), region_division.second, stats, true, this);
 	ui.frmMatchmakingOpponent->layout()->addWidget(region_info);
 
+	ui.lblVS->setText("VS");
+	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
+	ui.lblMapInfo->setText(map);
 }
 
 void MainWindow::matchmakingTimerWorker()
@@ -153,7 +183,8 @@ void MainWindow::matchmakingTimerWorker()
 	int secs = this->matchmaking_start_->elapsed()  / 1000;
 	int mins = (secs / 60) % 60;
 	secs = secs - (mins * 60);
-	ui.btnQueue->setText(QString("Queued (%1:%2)").arg(mins,2, 10, QLatin1Char('0')).arg(secs,2,10,QLatin1Char('0')));
+	ui.lblVS->setText(QString("%1:%2").arg(mins,2, 10, QLatin1Char('0')).arg(secs,2,10,QLatin1Char('0')));
+	ui.btnQueue->setText(QString("Abort Queue"));
 }
 
 void MainWindow::setQueueState(bool queueing)
@@ -168,6 +199,7 @@ void MainWindow::setQueueState(bool queueing)
 
 		MatchmakingSearchProgressWidget *search = new MatchmakingSearchProgressWidget(this);
 		ui.frmMatchmakingOpponent->layout()->addWidget(search);
+		ui.lblVS->setText("00:00");
 		ui.lblVS->setMaximumHeight(16777215);
 
 	}
@@ -191,6 +223,7 @@ void MainWindow::setQueueState(bool queueing)
 		
 	}
 	ui.btnQueue->setEnabled(true);
+	ui.lblMapInfo->setText("");
 }
 
 void MainWindow::btnQueue_pressed()
@@ -207,6 +240,11 @@ void MainWindow::btnQueue_pressed()
 			ErosRegion region = eros_->activeRegions()[regionIndex];
 			emit queueMatchmaking(region, this->config_->activeProfile()->searchRange());
 			ui.btnQueue->setEnabled(false);
+		}
+		else if (eros_->matchmakingState() == ErosMatchmakingState::Matched)
+		{
+			setQueueState(false);
+			QMessageBox::information(this, "Oh snap :(", "This doesn't exist yet. You've been placed back into an unqueued state.");
 		}
 	}
 }
@@ -238,7 +276,9 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 
 void MainWindow::erosConnected()
 {
+	setupWatches();
 	ui.cmbRegion->clear();
+	ui.lstChats->clear();
 	for (int i =0; i < this->eros_->activeRegions().count(); i++)
 	{
 		ui.cmbRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), Eros::regionToLongString(this->eros_->activeRegions()[i]), i);
@@ -255,6 +295,7 @@ void MainWindow::erosDisconnected()
 {
 	setUiEnabled(false);
 	setQueueState(false);
+	ui.lstChats->clear();
 }
 
 void MainWindow::erosLocalUserUpdated(LocalUser *user)
@@ -344,6 +385,14 @@ void MainWindow::label_linkActivated(const QString &link)
 		}
 
 	}
+	else if (link == "#upload")
+	{
+		QString filename = QFileDialog::getOpenFileName(this, tr("Select Replay"), this->config_->activeProfile()->replayFolder(), tr("Replay Files (*.SC2Replay);;All Files (*.*)"));
+		if (!filename.isEmpty())
+		{
+			emit uploadReplay(filename);
+		}
+	}
 }
 
 void MainWindow::tabContainer_tabCloseRequested(int index)
@@ -364,6 +413,8 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 					QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
 				}
 			}
+
+			setupWatches();
 		}
 	}	
 	
@@ -432,8 +483,30 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 	}
 
 	ChatWidget *widget = new ChatWidget(this->eros_, room);
-	int id = ui.tabContainer->addTab(widget, QIcon(":/img/client/icons/public_chat"), room->name());
+	QString icon = ":/img/client/icons/public_chat";
+	if (room->passworded())
+	{
+		icon = ":/img/client/icons/private_chat";
+	}
+	else if (!room->joinable() || room->fixed())
+	{
+		icon = ":/img/client/icons/match_chat";
+	}
+	int id = ui.tabContainer->addTab(widget, QIcon(icon), room->name());
+	
+	const MatchmakingMatch *match = eros_->matchmakingMatch();
+	if (match != nullptr)
+	{
+		if (room->key() == match->chatRoom()->key())
+		{
+			int regionIndex = ui.cmbRegion->currentData().toInt();
+			ErosRegion region = eros_->activeRegions()[regionIndex];
+			widget->writeLog(tr("You have been automatically joined to this chat room for your match against <strong>%1</strong> on <a href=\"starcraft://map/%2/%3\">%4</a>. GLHF!").arg(match->opponent()->username(), QString::number((int)region), QString::number(match->mapId()), match->mapName()), false); 
+		}
+	}
 	ui.tabContainer->setCurrentIndex(id);
+
+	ui.btnQueue->setText(tr("Forefeit Match"));
 }
 void MainWindow::erosChatRoomLeft(ChatRoom *room)
 {
@@ -441,7 +514,16 @@ void MainWindow::erosChatRoomLeft(ChatRoom *room)
 }
 void MainWindow::erosChatRoomAdded(ChatRoom *room)
 {
-	ui.lstChats->addItem(room->name());
+	QListWidgetItem *item = new QListWidgetItem(room->name());
+	if (room->passworded())
+	{
+		item->setIcon(QIcon(":/img/client/icons/padlock"));
+	}
+	else if (room->fixed() || !room->joinable())
+	{
+		item->setIcon(QIcon(":/img/client/icons/bow"));
+	}
+	ui.lstChats->addItem(item);
 	ui.lstChats->sortItems();
 }
 void MainWindow::erosChatRoomRemoved(ChatRoom *room)
@@ -471,6 +553,83 @@ void MainWindow::openBnetSettings()
 			{
 				ui.tabContainer->setCurrentIndex(i);
 			}
+		}
+	}
+}
+
+void MainWindow::erosReplayUploaded()
+{
+	QMessageBox::information(this, tr("Replay Uploaded Successfully."), tr("Your replay was successfully uploaded. In future more match info will be available to the client."));
+	setQueueState(false);
+}
+
+void MainWindow::erosReplayUploadError(ErosError error)
+{
+	QMessageBox::warning(this, tr("Replay Upload Error"), tr("Error uploading the replay.\nError %1: %2").arg(QString::number(error), Eros::errorString(error)));
+}
+
+void MainWindow::erosUploadProgress(qint64 written, qint64 total)
+{
+	int percent = ((written / total) * 100);
+	ui.lblInformation->setText(tr("Upload %1% complete").arg(percent));
+}
+
+void MainWindow::clearWatches()
+{
+	for (int i = 0; i < this->watches_.count(); i++)
+	{
+		this->watcher_->removeWatch(this->watches_.at(i));
+	}
+
+	this->watches_.clear();
+}
+void MainWindow::setupWatches()
+{
+	if (this->config_->activeProfile() != nullptr)
+	{
+		const QString &path = this->config_->activeProfile()->replayFolder();
+		if (!path.isEmpty())
+		{
+			addWatch(path);
+		}
+	}
+}
+
+void MainWindow::addWatch(const QString &path)
+{
+	QDir dir(path);
+	if (dir.exists())
+	{
+		dir.setFilter(QDir::Dirs | QDir::Hidden | QDir::NoSymLinks);
+		QFileInfoList list = dir.entryInfoList();
+
+		for (int i = 0; i < list.count(); i++)
+		{
+			if (list[i].fileName() == "." || list[i].fileName() == "..")
+				continue;
+
+			if (list[i].isDir())
+			{
+				addWatch(list[i].absoluteFilePath());
+			}
+		}
+
+		this->watches_ << this->watcher_->addWatch(path);
+	}
+}
+
+void MainWindow::fileAction(WatchID watchId, const QString &dir, const QString &filename, Action action)
+{
+	if (action == Action::Add)
+	{
+		QStringList pieces = filename.split('.');
+		QString extension = pieces.value(pieces.length()-1);
+
+		if(extension.toLower() == "sc2replay")
+		{
+			ui.lblInformation->setText(tr("Uploading %1").arg(filename));
+			QString path = dir + "/" + filename;
+			uploadReplay(path);		
 		}
 	}
 }
