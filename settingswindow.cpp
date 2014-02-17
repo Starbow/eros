@@ -167,6 +167,7 @@ void SettingsWindow::reconnectGUI()
 	this->disconnect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->disconnect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
 	this->disconnect(ui.cmbServer,         SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbServer_changed()));
+	this->disconnect(ui.btnBnetAccounts,SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
 
 	this->connect(ui.cmbProfiles,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbProfiles_changed()));
 	this->connect(ui.btnNewProfile,     SIGNAL(pressed()), this, SLOT(btnNewProfile_click()));
@@ -178,6 +179,7 @@ void SettingsWindow::reconnectGUI()
 	this->connect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->connect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
 	this->connect(ui.cmbServer,         SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbServer_changed()));
+	this->connect(ui.btnBnetAccounts,SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
 }
 
 bool SettingsWindow::profileExists(QString profileName)
@@ -227,6 +229,9 @@ void SettingsWindow::disableProfileInterface()
 	ui.lblChatLinks->setDisabled(true);
 	ui.lblLanguage->setDisabled(true);
 	ui.lblServer->setDisabled(true);	
+
+	//stuff withbnet
+	ui.btnBnetAccounts->setDisabled(true);
 }
 
 void SettingsWindow::enableProfileInterface()
@@ -250,6 +255,9 @@ void SettingsWindow::enableProfileInterface()
 	ui.lblChatLinks->setEnabled(true);
 	ui.lblLanguage->setEnabled(true);
 	ui.lblServer->setEnabled(true);	
+
+	//stuff withbnet
+	ui.btnBnetAccounts->setEnabled(true);
 }
 
 void SettingsWindow::refreshProfileInterface()
@@ -321,3 +329,4 @@ const QString SettingsWindow::boolToYesNo(bool yesno)
 		return "No";
 	}
 }
+

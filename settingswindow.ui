@@ -105,6 +105,13 @@
            </property>
           </widget>
          </item>
+         <item row="4" column="1">
+          <widget class="QPushButton" name="btnBnetAccounts">
+           <property name="text">
+            <string>Battle.net Accounts</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>

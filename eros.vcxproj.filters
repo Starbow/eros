@@ -104,6 +104,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_matchmakingsearchprogresswidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="bnetsettingswindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_bnetsettingswindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_bnetsettingswindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -145,6 +154,12 @@
     <CustomBuild Include="matchmakingsearchprogresswidget.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="bnetsettingswindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="bnetsettingswindow.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_mainwindow.h">
@@ -163,6 +178,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_matchmakingsearchprogresswidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_bnetsettingswindow.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

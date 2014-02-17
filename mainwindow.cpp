@@ -72,6 +72,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 
 	// UI Stuff
 	settings_window_ = nullptr;
+	bnetsettings_window_ = nullptr;
 
 	// Remove the close box from the first 2 tabs.
 	ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
@@ -362,7 +363,7 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 				}
 			}
 		}
-	}
+	}	
 	else if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
 	{
 		if (widget->chatroom() != nullptr)
@@ -370,6 +371,27 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 			emit leaveChatRoom(widget->chatroom());
 			delete widget;
 		}
+	}
+
+	if(bnetsettings_window_ != nullptr)
+	{
+		if (ui.tabContainer->widget(index) == bnetsettings_window_)
+		{
+			ui.tabContainer->removeTab(index);
+			delete bnetsettings_window_;
+			bnetsettings_window_ = nullptr;
+
+			//TODO: not sure if this is quite right but anyway
+			if (this->eros_->state() == ErosState::ConnectedState)
+			{
+				if (this->eros_->localUser()->username().toLower().trimmed() != this->config_->activeProfile()->username().toLower().trimmed())
+				{
+					emit disconnectFromEros();
+					QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
+				}
+			}
+		}
+
 	}
 	
 }
@@ -435,3 +457,27 @@ void MainWindow::erosChatRoomRemoved(ChatRoom *room)
 }
 
 //////// END CHAT
+
+
+//bnetsettings test
+void MainWindow::openBnetSettings()
+{
+	
+	MainWindow *main = (MainWindow*) this->parent();
+	if(bnetsettings_window_ == nullptr)
+	{
+		bnetsettings_window_ = new BnetSettingsWindow(this, config_);
+		ui.tabContainer->insertTab(3, bnetsettings_window_, "Battle.net Accounts");
+		ui.tabContainer->setCurrentIndex(3);
+	}
+	else
+	{
+		for (int i = 0; i < ui.tabContainer->count(); i++)
+		{
+			if (ui.tabContainer->widget(i) == bnetsettings_window_)
+			{
+				ui.tabContainer->setCurrentIndex(i);
+			}
+		}
+	}
+}

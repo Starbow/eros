@@ -20,8 +20,6 @@ public:
 	MainWindow(Eros *eros, QWidget *parent = 0);
 	~MainWindow();
 
-	
-
 private slots:
 
 	// Config slots
@@ -41,6 +39,8 @@ private slots:
 
 	void connectionTimerWorker();
 	void matchmakingTimerWorker();
+
+	void openBnetSettings();
 
 
 	// Eros Slots
@@ -86,6 +86,7 @@ signals:
 	//Upload replay slots
 	void uploadReplay(const QString path);
 	void uploadReplay(QIODevice *device);
+
 private:
 	Ui::MainWindow ui;
 
@@ -96,9 +97,11 @@ private:
 	Eros *eros_;
 	Config *config_;
 	SettingsWindow *settings_window_;
+	BnetSettingsWindow *bnetsettings_window_;
 	QString username_;
 	QString authtoken_;
 	QString server_;
+
 	
 };
 
