@@ -385,16 +385,6 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 			ui.tabContainer->removeTab(index);
 			delete bnetsettings_window_;
 			bnetsettings_window_ = nullptr;
-
-			//TODO: not sure if this is quite right but anyway
-			if (this->eros_->state() == ErosState::ConnectedState)
-			{
-				if (this->eros_->localUser()->username().toLower().trimmed() != this->config_->activeProfile()->username().toLower().trimmed())
-				{
-					emit disconnectFromEros();
-					QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
-				}
-			}
 		}
 
 	}

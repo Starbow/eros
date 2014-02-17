@@ -19,16 +19,6 @@ public:
 	bool chatLinks() const;
 	int searchRange() const;
 
-	QStringList getBnetProfiles()
-	{
-		return bnetProfiles_;
-	}
-
-	QString &getActiveBnetProfile()
-	{
-		return activeBnetProfile_;
-	}
-
 	void setUsername(const QString &);
 	void setToken(const QString &);
 	void setServer(const QString &);
@@ -38,13 +28,6 @@ public:
 
 	void save();
 
-	void addBnetProfile(QString bnetprofile);
-	void removeBnetProfile(QString bnetprofile);
-	void setActiveBnetProfile(QString bnetprofile);
-
-signals:
-	void activeBnetProfileChanged(QString bnetprofile);
-	void bnetAccountAdded(QString bnetUrl);
 
 private:
 	QSettings *settings_;
@@ -54,8 +37,6 @@ private:
 	QString language_;
 	int search_range_;
 	QString server_;
-	QStringList bnetProfiles_;
-	QString activeBnetProfile_;
 	
 };
 

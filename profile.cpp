@@ -13,15 +13,6 @@ Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 		this->chat_links_ = settings->value("chatlinks", true).toBool();
 		this->language_ = settings->value("language", "English").toString();
 		this->search_range_ = settings->value("searchrange", 1).toInt();
-		activeBnetProfile_ = settings->value("activebnetprofile", "").toString();
-		
-		int size = settings->beginReadArray("bnetprofiles");
-		for(int i=0; i<size; ++i)
-		{
-			settings->setArrayIndex(i);
-			bnetProfiles_.append(settings->value("bnetprofile").toString());			
-		}
-		settings->endArray();
 	}
 	else
 	{
@@ -31,8 +22,6 @@ Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 		this->chat_links_ = true;
 		this->language_ = "";
 		this->search_range_ = 1;
-		//bnetProfiles_; WHAT TO DO WITH YOU?
-		activeBnetProfile_ = "";
 	}
 }
 
@@ -49,15 +38,6 @@ void Profile::save()
 	settings_->setValue("language", this->language_);
 	settings_->setValue("chatlinks", this->chat_links_);
 	settings_->setValue("searchrange", this->search_range_);
-	settings_->setValue("activebnetprofile", activeBnetProfile_);
-	
-	settings_->beginWriteArray("bnetprofiles");
-	for(int i=0; i<bnetProfiles_.size(); ++i)
-	{
-		settings_->setArrayIndex(i);
-		settings_->setValue("bnetprofile",bnetProfiles_.at(i));
-	}
-	settings_->endArray();
 }
 const QString &Profile::username() const
 {
@@ -107,18 +87,4 @@ void Profile::setChatLinks(bool chatlinks)
 void Profile::setSearchRange(int range)
 {
 	this->search_range_ = range;
-}
-void Profile::addBnetProfile(QString bnetprofile)
-{
-	bnetProfiles_.append(bnetprofile);
-	emit bnetAccountAdded(bnetprofile);
-}
-void Profile::removeBnetProfile(QString bnetprofile)
-{
-	bnetProfiles_.removeOne(bnetprofile);
-}
-void Profile::setActiveBnetProfile(QString bnetprofile)
-{
-	activeBnetProfile_ = bnetprofile;
-	emit activeBnetProfileChanged(activeBnetProfile_);
 }
