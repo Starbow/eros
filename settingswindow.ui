@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>659</width>
-    <height>185</height>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,11 +45,8 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QFormLayout" name="formLayout_2">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-         </property>
-         <item row="0" column="0">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
           <widget class="QLabel" name="lblProfile">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -62,7 +59,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item>
           <widget class="QComboBox" name="cmbProfiles">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -72,7 +69,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item>
           <widget class="QPushButton" name="btnSetToken">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -85,17 +82,10 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QPushButton" name="btnNewProfile">
-           <property name="text">
-            <string>New Profile</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
+         <item>
           <widget class="QPushButton" name="btnDeleteProfile">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -105,10 +95,27 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item>
+          <widget class="QPushButton" name="btnNewProfile">
+           <property name="text">
+            <string>New Profile</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="btnBnetAccounts">
            <property name="text">
             <string>Battle.net Accounts</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frmSpaceWaster">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
            </property>
           </widget>
          </item>
@@ -130,15 +137,31 @@
       <string>Options</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0" alignment="Qt::AlignTop">
-       <widget class="QFrame" name="frameSearchRange">
+      <item row="4" column="0">
+       <widget class="QFrame" name="frmSpaceWaster_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QFormLayout" name="formLayout_4">
+       </widget>
+      </item>
+      <item row="1" column="0" alignment="Qt::AlignTop">
+       <widget class="QFrame" name="frameAutostart">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QFormLayout" name="formLayout_3">
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
          </property>
@@ -155,30 +178,22 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QLabel" name="lblSearchRange">
+          <widget class="QLabel" name="lblAutostart">
            <property name="text">
-            <string>Search range</string>
+            <string>Start Starbow on Login</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="cmbSearchRange">
-           <property name="currentText">
-            <string>Narrow</string>
-           </property>
+          <widget class="QComboBox" name="cmbAutostart">
            <item>
             <property name="text">
-             <string>Narrow</string>
+             <string>No</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Normal</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Wide</string>
+             <string>Yes</string>
             </property>
            </item>
           </widget>
@@ -216,54 +231,6 @@
          </item>
          <item row="0" column="1">
           <widget class="QComboBox" name="cmbChatLinks">
-           <item>
-            <property name="text">
-             <string>No</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Yes</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0" alignment="Qt::AlignTop">
-       <widget class="QFrame" name="frameAutostart">
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QFormLayout" name="formLayout_3">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="lblAutostart">
-           <property name="text">
-            <string>Start Starbow on Login</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="cmbAutostart">
            <item>
             <property name="text">
              <string>No</string>
@@ -319,15 +286,18 @@
         </layout>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QFrame" name="frameServer">
+      <item row="0" column="0" alignment="Qt::AlignTop">
+       <widget class="QFrame" name="frameSearchRange">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QFormLayout" name="formLayout_6">
+        <layout class="QFormLayout" name="formLayout_4">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -341,22 +311,30 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QLabel" name="lblServer">
+          <widget class="QLabel" name="lblSearchRange">
            <property name="text">
-            <string>Server</string>
+            <string>Search range</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="cmbServer">
+          <widget class="QComboBox" name="cmbSearchRange">
+           <property name="currentText">
+            <string>Narrow</string>
+           </property>
            <item>
             <property name="text">
-             <string>eros.starbowmod.com</string>
+             <string>Narrow</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>localhost</string>
+             <string>Normal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Wide</string>
             </property>
            </item>
           </widget>

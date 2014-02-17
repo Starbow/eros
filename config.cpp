@@ -1,5 +1,7 @@
 #include "config.h"
 
+#define EROS_DEFAULT_SERVER "eros.starbowmod.com"
+
 Config::Config(QObject *parent)
 	: QObject(parent)
 {
@@ -24,6 +26,7 @@ Config::Config(QObject *parent)
 	{
 		this->active_profile_ = this->profiles_[active_profile_id-1];
 	} 
+	this->server_ = this->settings_->value("server", EROS_DEFAULT_SERVER).toString();
 }
 
 Config::~Config()
@@ -37,6 +40,10 @@ Config::~Config()
 const QList<Profile*> &Config::profiles() const
 {
 	return this->profiles_;
+}
+const QString &Config::server() const
+{
+	return this->server_;
 }
 Profile *Config::activeProfile() const
 {

@@ -14,14 +14,12 @@ public:
 
 	const QString &username() const;
 	const QString &token() const;
-	const QString &server() const;
 	const QString &language() const;
 	bool chatLinks() const;
 	int searchRange() const;
 
 	void setUsername(const QString &);
 	void setToken(const QString &);
-	void setServer(const QString &);
 	void setLanguage(const QString &);
 	void setChatLinks(bool);
 	void setSearchRange(int);
@@ -35,9 +33,7 @@ private:
 	QString token_;
 	bool chat_links_;
 	QString language_;
-	int search_range_;
-	QString server_;
-	
+	int search_range_;	
 };
 
 #endif // EROS_PROFILE_H

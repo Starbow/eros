@@ -129,11 +129,6 @@ void SettingsWindow::cmbLanguage_changed()
 	config_->activeProfile()->setLanguage(ui.cmbLanguage->currentText());
 }
 
-void SettingsWindow::cmbServer_changed()
-{
-	config_->activeProfile()->setServer(ui.cmbServer->currentText());
-}
-
 void SettingsWindow::btnOK_click()
 {
 	this->close();
@@ -166,7 +161,6 @@ void SettingsWindow::reconnectGUI()
 	this->disconnect(ui.cmbAutostart,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbAutostart_changed()));
 	this->disconnect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->disconnect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
-	this->disconnect(ui.cmbServer,         SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbServer_changed()));
 	this->disconnect(ui.btnBnetAccounts,SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
 
 	this->connect(ui.cmbProfiles,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbProfiles_changed()));
@@ -178,7 +172,6 @@ void SettingsWindow::reconnectGUI()
 	this->connect(ui.cmbAutostart,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbAutostart_changed()));
 	this->connect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->connect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
-	this->connect(ui.cmbServer,         SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbServer_changed()));
 	this->connect(ui.btnBnetAccounts,SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
 }
 
@@ -204,22 +197,19 @@ void SettingsWindow::disableProfileInterface()
 	ui.cmbSearchRange->setDisabled(true);
 	ui.cmbAutostart->setDisabled(true);
 	ui.cmbChatLinks->setDisabled(true);
-	ui.cmbLanguage->setDisabled(true);
-	ui.cmbServer->setDisabled(true);	
+	ui.cmbLanguage->setDisabled(true);	
 
 	ui.cmbProfiles->setCurrentIndex(-1);
 	ui.cmbSearchRange->setCurrentIndex(-1);
 	ui.cmbAutostart->setCurrentIndex(-1);	
 	ui.cmbChatLinks->setCurrentIndex(-1);	
 	ui.cmbLanguage->setCurrentIndex(-1);
-	ui.cmbServer->setCurrentIndex(-1);
 
 	ui.cmbProfiles->disconnect();
 	ui.cmbSearchRange->disconnect();
 	ui.cmbAutostart->disconnect();
 	ui.cmbChatLinks->disconnect();
 	ui.cmbLanguage->disconnect();
-	ui.cmbServer->disconnect();
 	
 	ui.cmbProfiles->clear();
 
@@ -227,8 +217,7 @@ void SettingsWindow::disableProfileInterface()
 	ui.lblSearchRange->setDisabled(true);
 	ui.lblAutostart->setDisabled(true);
 	ui.lblChatLinks->setDisabled(true);
-	ui.lblLanguage->setDisabled(true);
-	ui.lblServer->setDisabled(true);	
+	ui.lblLanguage->setDisabled(true);	
 
 	//stuff withbnet
 	ui.btnBnetAccounts->setDisabled(true);
@@ -247,14 +236,12 @@ void SettingsWindow::enableProfileInterface()
 	ui.cmbAutostart->setEnabled(true);
 	ui.cmbChatLinks->setEnabled(true);
 	ui.cmbLanguage->setEnabled(true);
-	ui.cmbServer->setEnabled(true);	
 
 	//enable option lables
 	ui.lblSearchRange->setEnabled(true);
 	ui.lblAutostart->setEnabled(true);
 	ui.lblChatLinks->setEnabled(true);
 	ui.lblLanguage->setEnabled(true);
-	ui.lblServer->setEnabled(true);	
 
 	//stuff withbnet
 	ui.btnBnetAccounts->setEnabled(true);
@@ -275,7 +262,6 @@ void SettingsWindow::refreshProfileInterface()
 	ui.cmbAutostart->setCurrentIndex(ui.cmbAutostart->findText(boolToYesNo(config_->startOnLogin())));
 	ui.cmbChatLinks->setCurrentIndex(ui.cmbChatLinks->findText(boolToYesNo(this->config_->activeProfile()->chatLinks())));
 	ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findText(this->config_->activeProfile()->language()));
-	ui.cmbServer->setCurrentIndex(ui.cmbServer->findText(this->config_->activeProfile()->server()));
 }
 
 const short int SettingsWindow::searchRangeToInt(QString searchRange)

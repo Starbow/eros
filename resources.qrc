@@ -35,4 +35,11 @@
     <file alias="league_4">res/img/client/icons/league_4.png</file>
     <file alias="league_5">res/img/client/icons/league_5.png</file>
   </qresource>
+  <qresource prefix="/img/client/icons/flags">
+    <file alias="CN">res/img/client/icons/flags/cn.png</file>
+    <file alias="EU">res/img/client/icons/flags/eu.png</file>
+    <file alias="KR">res/img/client/icons/flags/kr.png</file>
+    <file alias="SEA">res/img/client/icons/flags/sg.png</file>
+    <file alias="NA">res/img/client/icons/flags/us.png</file>
+  </qresource>
 </RCC>

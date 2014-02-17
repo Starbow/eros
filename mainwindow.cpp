@@ -89,9 +89,6 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(ui.cmbRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbRegion_currentIndexChanged(int)));
 	QObject::connect(ui.btnQueue, SIGNAL(pressed()), this, SLOT(btnQueue_pressed()));
 
-	//im not sure why this doesnt work
-	QObject::connect(config_->activeProfile(), SIGNAL(bnetAccountAdded(const QString)), eros_, SIGNAL(addCharacter(const QString)));
-
 	this->connection_timer_->setInterval(500);
 	this->connection_timer_->start();
 }
@@ -244,7 +241,7 @@ void MainWindow::erosConnected()
 	ui.cmbRegion->clear();
 	for (int i =0; i < this->eros_->activeRegions().count(); i++)
 	{
-		ui.cmbRegion->addItem(Eros::regionToLongString(this->eros_->activeRegions()[i]), i);
+		ui.cmbRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), Eros::regionToLongString(this->eros_->activeRegions()[i]), i);
 	}
 	ui.cmbRegion->setCurrentIndex(0);
 
@@ -298,7 +295,7 @@ void MainWindow::connectionTimerWorker()
 	{
 		if (this->eros_->state() == ErosState::UnconnectedState)
 		{
-			const QString &server = this->config_->activeProfile()->server();
+			const QString &server = this->config_->server();
 			const QString &username = this->config_->activeProfile()->username();
 			const QString &token = this->config_->activeProfile()->token();
 
@@ -369,7 +366,8 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 			}
 		}
 	}	
-	else if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
+	
+	if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
 	{
 		if (widget->chatroom() != nullptr)
 		{
@@ -461,9 +459,9 @@ void MainWindow::openBnetSettings()
 	MainWindow *main = (MainWindow*) this->parent();
 	if(bnetsettings_window_ == nullptr)
 	{
-		bnetsettings_window_ = new BnetSettingsWindow(this, config_);
-		ui.tabContainer->insertTab(3, bnetsettings_window_, "Battle.net Accounts");
-		ui.tabContainer->setCurrentIndex(3);		
+		bnetsettings_window_ = new BnetSettingsWindow(this, this->eros_);
+		ui.tabContainer->insertTab(2, bnetsettings_window_, "Battle.net Accounts");
+		ui.tabContainer->setCurrentIndex(2);		
 	}
 	else
 	{

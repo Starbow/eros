@@ -19,7 +19,7 @@ public:
 	const QList<Profile*> &profiles() const;
 	Profile *activeProfile() const;
 	bool startOnLogin() const;
-
+	const QString &server() const;
 	
 	void setActiveProfile(Profile *);
 	void setStartOnLogin(bool);
@@ -31,6 +31,7 @@ private:
 	Profile *active_profile_;
 	bool start_on_login_;
 	QSettings *settings_;
+	QString server_;
 
 signals:
 	void activeProfileChanged(Profile *profile);
