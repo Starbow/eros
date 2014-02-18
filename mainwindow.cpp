@@ -90,9 +90,10 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	bnetsettings_window_ = nullptr;
 
 	// Remove the close box from the first 2 tabs.
-	ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
-	ui.tabContainer->tabBar()->tabButton(1, QTabBar::RightSide)->resize(0, 0);
-
+#ifdef WIN32
+    ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
+    ui.tabContainer->tabBar()->tabButton(1, QTabBar::RightSide)->resize(0, 0);
+#endif
 	
 	QObject::connect(ui.tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(tabContainer_tabCloseRequested(int)));
 	QObject::connect(ui.lblBottomMenu, SIGNAL(linkActivated(const QString &)), this, SLOT(label_linkActivated(const QString&)));

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>653</width>
+    <width>690</width>
     <height>484</height>
    </rect>
   </property>
@@ -14,13 +14,19 @@
    <string>Starbow Client Preview</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#tabMatchmaking {
+   <string notr="true">.QFrame 
+{
+	border: none;
+}
+
+#tabMatchmaking {
 	background-color: #fff;
 }
 
 #tabMatchmaking {
 	background-color: #fff;
 }
+
 
 ChatWidget {
 	background-color: #fff;
@@ -34,12 +40,15 @@ QTabWidget::pane {
 	border: 0;
 	background-color: #fff;
 }
-
+QTabWidget::tab-bar
+{
+	alignment: left;
+}
 QTabBar::tab  {
 	color: #fff;
     background: #560d0d;
-    alignment: center;
-	text-align: center;
+    alignment: left;
+	text-align: left;
 	border-right: 1px solid palette(window);
     min-width: 8ex;
     padding-top: 4px;
@@ -47,7 +56,8 @@ QTabBar::tab  {
 	padding-left: 16px;
 	padding-right: 16px;
 }
- 
+
+
 QTabBar::tab:selected, QTabBar::tab:hover  {
 	background-color: #fff;
 	color: #000;
