@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "settingswindow.h"
+#include "bnetsettingswindow.h"
 #include "ui_mainwindow.h"
 #include "../liberos/eros.h"
 
@@ -26,7 +27,7 @@ private slots:
 
 	// Config slots
 
-	//void activeProfileChanged(Profile *profile);
+	void activeProfileChanged();
 
 	// UI Slots
 	void label_linkActivated(const QString &link);
@@ -49,6 +50,7 @@ private slots:
 	void erosStateChanged(ErosState state);
 	void erosConnected();
 	void erosDisconnected();
+	void erosHandshakeFailed();
 
 	// Chat
 	void erosChatRoomJoined(ChatRoom *room);

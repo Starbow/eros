@@ -34,8 +34,20 @@ SettingsWindow::~SettingsWindow()
 
 void SettingsWindow::cmbProfiles_changed()
 {	
-	config_->setActiveProfile(config_->profiles()[ui.cmbProfiles->currentIndex()]);
-	refreshProfileInterface();
+	if (ui.cmbProfiles->currentIndex() >= 0)
+	{
+		config_->setActiveProfile(config_->profiles()[ui.cmbProfiles->currentIndex()]);
+		refreshProfileInterface();
+		emit profileChanged();
+	}
+	else 
+	{
+		config_->setActiveProfile(nullptr);
+		enableProfileInterface();
+		disableProfileInterface();
+	}
+	
+	
 }
 
 void SettingsWindow::btnNewProfile_click()
@@ -91,15 +103,19 @@ void SettingsWindow::btnDeleteProfile_click()
 			refreshProfileInterface();
 		}
 		
+		emit profileChanged();
 	}
 }
 
 void SettingsWindow::cmbSearchRange_changed()
 {
-
+	if (config_->activeProfile() == nullptr)
+	return;
 	QString searchRange = ui.cmbSearchRange->currentText();
 
-	config_->activeProfile()->setSearchRange(searchRangeToInt(searchRange));//ui.cmbSearchRange->currentText().toInt());//->currentData().toInt());
+
+	config_->activeProfile()->setSearchRange(searchRangeToInt(searchRange));
+	
 }
 
 void SettingsWindow::cmbAutostart_changed()
@@ -116,16 +132,22 @@ void SettingsWindow::cmbAutostart_changed()
 
 void SettingsWindow::cmbChatLinks_changed()
 {
+	if (config_->activeProfile() == nullptr)
+		return;
+
 	bool links = false;
 	if(ui.cmbChatLinks->currentText() == "Yes")
 	{
 		links = true;
 	}
+
 	config_->activeProfile()->setChatLinks(links);
 }
 
 void SettingsWindow::cmbLanguage_changed()
 {
+	if (config_->activeProfile() == nullptr)
+		return;
 	config_->activeProfile()->setLanguage(ui.cmbLanguage->currentText());
 }
 
@@ -142,6 +164,7 @@ void SettingsWindow::btnSetToken_click()
 	if(token.isEmpty() == false && ok == true)
 	{
 		this->config_->activeProfile()->setToken(token);
+		emit profileChanged();
 	}
 	else
 	{
@@ -153,7 +176,7 @@ void SettingsWindow::reconnectGUI()
 {
 	//just make sure they are disconnected first so we dont get double connection anywhere
 	this->disconnect(ui.cmbProfiles,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbProfiles_changed()));
-	this->disconnect(ui.btnNewProfile,     SIGNAL(pressed()), this, SLOT(btnNewProfile_click()));
+	this->disconnect(ui.btnNewProfile,     SIGNAL(clicked()), this, SLOT(btnNewProfile_click()));
 	this->disconnect(ui.btnDeleteProfile,  SIGNAL(clicked()), this, SLOT(btnDeleteProfile_click()));
 	//this->disconnect(ui.btnOK,             SIGNAL(clicked()), this, SLOT(btnOK_click()));
 	this->disconnect(ui.btnSetToken,       SIGNAL(clicked()), this, SLOT(btnSetToken_click()));
@@ -161,10 +184,9 @@ void SettingsWindow::reconnectGUI()
 	this->disconnect(ui.cmbAutostart,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbAutostart_changed()));
 	this->disconnect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->disconnect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
-	this->disconnect(ui.btnBnetAccounts,SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
 
 	this->connect(ui.cmbProfiles,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbProfiles_changed()));
-	this->connect(ui.btnNewProfile,     SIGNAL(pressed()), this, SLOT(btnNewProfile_click()));
+	this->connect(ui.btnNewProfile,     SIGNAL(clicked()), this, SLOT(btnNewProfile_click()));
 	this->connect(ui.btnDeleteProfile,  SIGNAL(clicked()), this, SLOT(btnDeleteProfile_click()));
 //	this->connect(ui.btnOK,             SIGNAL(clicked()), this, SLOT(btnOK_click()));
 	this->connect(ui.btnSetToken,       SIGNAL(clicked()), this, SLOT(btnSetToken_click()));
@@ -173,7 +195,6 @@ void SettingsWindow::reconnectGUI()
 	this->connect(ui.cmbAutostart,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbAutostart_changed()));
 	this->connect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->connect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
-	this->connect(ui.btnBnetAccounts,	SIGNAL(pressed()), this->parent(), SLOT(openBnetSettings()));
 }
 
 bool SettingsWindow::profileExists(QString profileName)
@@ -195,19 +216,21 @@ void SettingsWindow::disableProfileInterface()
 	ui.btnDeleteProfile->setDisabled(true);
 	ui.btnSetToken->setDisabled(true);
 
-	/*
+	
 	ui.cmbProfiles->setDisabled(true);
 	ui.cmbSearchRange->setDisabled(true);
 	ui.cmbAutostart->setDisabled(true);
 	ui.cmbChatLinks->setDisabled(true);
 	ui.cmbLanguage->setDisabled(true);	
+	ui.btnSelectWatchFolder->setDisabled(true);
+
 	
 	ui.lblSearchRange->setDisabled(true);
 	ui.lblAutostart->setDisabled(true);
 	ui.lblChatLinks->setDisabled(true);
 	ui.lblLanguage->setDisabled(true);	
-	*/
-	ui.gbSettings->setEnabled(false);
+	ui.lblUserFolder->setDisabled(true);
+
 
 	ui.cmbProfiles->setCurrentIndex(-1);
 	ui.cmbSearchRange->setCurrentIndex(-1);
@@ -223,9 +246,6 @@ void SettingsWindow::disableProfileInterface()
 	
 	ui.cmbProfiles->clear();
 
-
-	//stuff withbnet
-	ui.btnBnetAccounts->setDisabled(true);
 }
 
 void SettingsWindow::enableProfileInterface()
@@ -235,23 +255,21 @@ void SettingsWindow::enableProfileInterface()
 	ui.btnDeleteProfile->setEnabled(true);
 	ui.btnSetToken->setEnabled(true);
 
-	/*
+	
 	//enable comboboxes
 	ui.cmbProfiles->setEnabled(true);
 	ui.cmbSearchRange->setEnabled(true);
 	ui.cmbAutostart->setEnabled(true);
 	ui.cmbChatLinks->setEnabled(true);
 	ui.cmbLanguage->setEnabled(true);
+	ui.btnSelectWatchFolder->setEnabled(true);
 
 	//enable option lables
 	ui.lblSearchRange->setEnabled(true);
 	ui.lblAutostart->setEnabled(true);
 	ui.lblChatLinks->setEnabled(true);
-	ui.lblLanguage->setEnabled(true);*/
-	ui.gbSettings->setEnabled(true);
-
-	//stuff withbnet
-	ui.btnBnetAccounts->setEnabled(true);
+	ui.lblLanguage->setEnabled(true);
+	ui.lblUserFolder->setEnabled(true);
 }
 
 void SettingsWindow::refreshProfileInterface()

@@ -20,9 +20,12 @@ public:
 	Profile *activeProfile() const;
 	bool startOnLogin() const;
 	const QString &server() const;
-	
+	int preferredRegion() const;
+
 	void setActiveProfile(Profile *);
 	void setStartOnLogin(bool);
+	void setPreferredRegion(int);
+
 	Profile *createProfile(const QString &username);
 	void removeProfile(Profile *profile);
 
@@ -32,6 +35,7 @@ private:
 	bool start_on_login_;
 	QSettings *settings_;
 	QString server_;
+	int preferred_region_;
 
 signals:
 	void activeProfileChanged(Profile *profile);

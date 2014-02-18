@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>690</width>
+    <width>781</width>
     <height>484</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Starbow Client Preview</string>
+   <string>Eros</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">.QFrame 
+   <string notr="true">.QFrame
 {
 	border: none;
 }
@@ -23,8 +23,12 @@
 	background-color: #fff;
 }
 
-#tabMatchmaking {
+#tabChat {
 	background-color: #fff;
+}
+
+#frmMatchmaking {
+
 }
 
 
@@ -33,7 +37,7 @@ ChatWidget {
 }
 
 QWidget {
-		font-family: Noto Sans;
+		font-family: &quot;Noto Sans&quot;;
 }
 
 QTabWidget::pane {
@@ -55,6 +59,7 @@ QTabBar::tab  {
     padding-bottom: 4px;
 	padding-left: 16px;
 	padding-right: 16px;
+    font-family: &quot;Gobold Bold&quot;;
 }
 
 
@@ -97,10 +102,10 @@ QComboBox:editable  {
 }
 
  QPushButton {
-    background-color: #560d0d;
-	color: #fff;
-	font-family: Noto Sans;
-	font-weight: bold;
+    background-color:#560d0d;
+    color:#e3e4e6;
+	font-family: &quot;Gobold Bold&quot;;
+	font-size: 12px;
 	border: 1px solid #3b0505;
 	padding: 2px;
 	min-width: 50px;
@@ -116,7 +121,25 @@ QComboBox:editable  {
 
  QPushButton:default {
      border-color: red; /* make the default button prominent */
- }</string>
+ }
+
+QPushButton:!enabled
+{
+    background-color: #83746d;
+}
+
+QLineEdit
+{
+	background-color: rgba(32,32,31,0.1);
+	border: 1px solid #560d0d;
+	font-size: 12px;
+	padding: 3px;
+}
+
+QLineEdit:focus
+{
+     background-color:#e3e4e6;
+}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -758,7 +781,7 @@ color: #560d0d;</string>
           </size>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;| &lt;a href=&quot;#upload&quot;&gt;Manual Replay Upload&lt;/a&gt; | &lt;a href=&quot;#options&quot;&gt;Options&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head&gt;&lt;style&gt;a {color: #380404;}&lt;/style&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;| &lt;a href=&quot;#upload&quot;&gt;Manual Replay Upload&lt;/a&gt; | &lt;a href=&quot;#battlenet&quot;&gt;Manage Battle.net accounts&lt;/a&gt; | &lt;a href=&quot;#options&quot;&gt;Options&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="openExternalLinks">
           <bool>false</bool>

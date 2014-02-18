@@ -21,6 +21,7 @@ Config::Config(QObject *parent)
 
 	int active_profile_id = this->settings_->value("activeprofile", 0).toInt();
 	this->start_on_login_ = this->settings_->value("startonlogin", false).toBool();
+	this->preferred_region_ = this->settings_->value("preferredregion", 1).toInt();
 
 	if (active_profile_id > 0 && active_profile_id <= this->profiles_.count())
 	{
@@ -53,6 +54,10 @@ bool Config::startOnLogin() const
 {
 	return this->start_on_login_;
 }
+int Config::preferredRegion() const
+{
+	return this->preferred_region_;
+}
 
 void Config::setActiveProfile(Profile * profile)
 {
@@ -70,10 +75,17 @@ void Config::setStartOnLogin(bool start)
 	// perhaps put the relevant registy / whatever mac has entries here
 }
 
+void Config::setPreferredRegion(int region)
+{
+	this->preferred_region_ = region;
+	this->settings_->setValue("preferredregion", this->preferred_region_);
+}
+
 void Config::save()
 {
 	this->settings_->setValue("activeprofile", this->profiles_.indexOf(this->active_profile_) + 1);
 	this->settings_->setValue("startonlogin", this->start_on_login_);
+	this->settings_->setValue("preferredregion", this->preferred_region_);
 
 	this->settings_->beginWriteArray("profile");
 	for (int i = 0; i < this->profiles_.count(); i++)

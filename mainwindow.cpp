@@ -1,6 +1,4 @@
 #include "mainwindow.h"
-#include "settingswindow.h"
-
 #include <QLocale>
 #include <QFontDatabase>
 #include <QMessageBox>
@@ -56,6 +54,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	/// Eros Signals
 	QObject::connect(eros_, SIGNAL(stateChanged(ErosState)), this, SLOT(erosStateChanged(ErosState)));
 	QObject::connect(eros_, SIGNAL(connected()), this, SLOT(erosConnected()));
+	QObject::connect(eros_, SIGNAL(disconnected()), this, SLOT(erosDisconnected()));
+	QObject::connect(eros_, SIGNAL(handshakeFailed()), this, SLOT(erosHandshakeFailed()));
 	QObject::connect(eros_, SIGNAL(chatRoomAdded(ChatRoom*)), this, SLOT(erosChatRoomAdded(ChatRoom*)));
 	QObject::connect(eros_, SIGNAL(chatRoomRemoved(ChatRoom*)), this, SLOT(erosChatRoomRemoved(ChatRoom*)));
 	QObject::connect(eros_, SIGNAL(chatRoomJoined(ChatRoom*)), this, SLOT(erosChatRoomJoined(ChatRoom*)));
@@ -245,6 +245,7 @@ void MainWindow::btnQueue_pressed()
 		{
 			int regionIndex = ui.cmbRegion->currentData().toInt();
 			ErosRegion region = eros_->activeRegions()[regionIndex];
+			this->config_->setPreferredRegion(region);
 			emit queueMatchmaking(region, this->config_->activeProfile()->searchRange());
 			ui.btnQueue->setEnabled(false);
 		}
@@ -264,6 +265,7 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 	LocalUser *user = eros_->localUser();
 	int regionIndex = ui.cmbRegion->currentData().toInt();
 	ErosRegion region = eros_->activeRegions()[regionIndex];
+	this->config_->setPreferredRegion(region);
 
 	if (user != nullptr)
 	{
@@ -289,11 +291,19 @@ void MainWindow::erosConnected()
 	setupWatches();
 	ui.cmbRegion->clear();
 	ui.lstChats->clear();
+	int set_index = 0;
+	int pref_region = this->config_->preferredRegion();
 	for (int i =0; i < this->eros_->activeRegions().count(); i++)
 	{
 		ui.cmbRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), Eros::regionToLongString(this->eros_->activeRegions()[i]), i);
+		if (this->eros_->activeRegions()[i] == pref_region)
+			set_index = i;
 	}
-	ui.cmbRegion->setCurrentIndex(0);
+	if (pref_region < 1)
+		set_index = 0;
+
+	if (ui.cmbRegion->count() > 0)
+		ui.cmbRegion->setCurrentIndex(set_index);
 
 	erosLocalUserUpdated(this->eros_->localUser());
 
@@ -307,6 +317,13 @@ void MainWindow::erosDisconnected()
 	setQueueState(false);
 	ui.lstChats->clear();
 }
+
+void MainWindow::erosHandshakeFailed()
+{
+	this->connection_timer_->stop();
+	ui.lblInformation->setText(tr("Authentication failed. Check your token."));
+}
+
 
 void MainWindow::erosLocalUserUpdated(LocalUser *user)
 {
@@ -379,7 +396,7 @@ void MainWindow::label_linkActivated(const QString &link)
 		if (this->settings_window_ == nullptr)
 		{
 			this->settings_window_ = new SettingsWindow(this, this->config_);
-		
+			QObject::connect(this->settings_window_, SIGNAL(profileChanged()), this, SLOT(activeProfileChanged()));
 			ui.tabContainer->insertTab(2, this->settings_window_, "Settings");
 			ui.tabContainer->setCurrentIndex(2);
 		} 
@@ -401,6 +418,17 @@ void MainWindow::label_linkActivated(const QString &link)
 		if (!filename.isEmpty())
 		{
 			emit uploadReplay(filename);
+		}
+	}
+	else if (link == "#battlenet")
+	{
+		if (this->eros_->state() != ErosState::ConnectedState)
+		{
+			QMessageBox::information(this, tr("Unable to open Battle.Net Settings"), tr("You must be logged in before you can manage your Battle.net settings."));
+		}
+		else
+		{
+			openBnetSettings();
 		}
 	}
 }
@@ -511,7 +539,7 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 		{
 			int regionIndex = ui.cmbRegion->currentData().toInt();
 			ErosRegion region = eros_->activeRegions()[regionIndex];
-			widget->writeLog(tr("You have been automatically joined to this chat room for your match against <strong>%1</strong> on <a href=\"starcraft://map/%2/%3\">%4</a>. We suggest joining the channel <strong>%5</strong> on Battle.net. GLHF!").arg(match->opponent()->username(), QString::number((int)region), QString::number(match->mapId()), match->mapName(), match->battleNetChannel()), false); 
+			widget->writeLog(tr("You have been automatically joined to this chat room for your match against <strong>%1</strong> on <a href=\"starcraft://map/%2/%3\">%4</a>. Don't forget to set the game speed to <strong>Faster</strong> when clicking the map link. We suggest joining the channel <strong>%5</strong> on Battle.net. GLHF!").arg(match->opponent()->username(), QString::number((int)region), QString::number(match->mapId()), match->mapName(), match->battleNetChannel()), false); 
 		}
 	}
 	ui.tabContainer->setCurrentIndex(id);
@@ -543,11 +571,9 @@ void MainWindow::erosChatRoomRemoved(ChatRoom *room)
 //////// END CHAT
 
 
-//bnetsettings test
 void MainWindow::openBnetSettings()
 {
 	
-	MainWindow *main = (MainWindow*) this->parent();
 	if(bnetsettings_window_ == nullptr)
 	{
 		bnetsettings_window_ = new BnetSettingsWindow(this, this->eros_);
@@ -654,4 +680,10 @@ void MainWindow::fileAction(WatchID watchId, const QString &dir, const QString &
 			uploadReplay(path);		
 		}
 	}
+}
+
+void MainWindow::activeProfileChanged()
+{
+	emit disconnectFromEros();
+	QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
 }

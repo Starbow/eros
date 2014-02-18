@@ -5,7 +5,6 @@
 #include <QDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <bnetsettingswindow.h>
 
 #include "config.h"
 
@@ -58,6 +57,8 @@ private:
 	
 	const QString boolToYesNo(bool yesno);
 
+signals:
+	void profileChanged();
 };
 
 #endif // EROS_SETTINGSWINDOW_H

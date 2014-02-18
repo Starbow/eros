@@ -103,13 +103,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnBnetAccounts">
-           <property name="text">
-            <string>Battle.net Accounts</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QFrame" name="frmSpaceWaster">
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
@@ -373,7 +366,7 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lblUserFolder">
            <property name="text">
             <string>StarCraft II User Folder</string>
            </property>
