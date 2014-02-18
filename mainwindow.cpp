@@ -71,12 +71,13 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	/// Eros Slots
 	QObject::connect(this, SIGNAL(connectToEros(const QString, const QString, const QString)), eros_, SLOT(connectToEros(const QString, const QString, const QString)));
 	QObject::connect(this, SIGNAL(disconnectFromEros()), eros_, SLOT(disconnectFromEros()));
-	QObject::connect(ui.btnRefreshChats, SIGNAL(pressed()), eros_, SLOT(refreshChatRooms()));
+	QObject::connect(ui.btnRefreshChats, SIGNAL(clicked()), eros_, SLOT(refreshChatRooms()));
 	QObject::connect(this, SIGNAL(joinChatRoom(ChatRoom *, const QString)), eros_, SLOT(joinChatRoom(ChatRoom *, const QString)));
 	QObject::connect(this, SIGNAL(leaveChatRoom(ChatRoom *)), eros_, SLOT(leaveChatRoom(ChatRoom *)));
 
 	QObject::connect(this, SIGNAL(queueMatchmaking(ErosRegion, int)), eros_, SLOT(queueMatchmaking(ErosRegion, int)));
 	QObject::connect(this, SIGNAL(dequeueMatchmaking()), eros_, SLOT(dequeueMatchmaking()));
+	QObject::connect(this, SIGNAL(forefeitMatchmaking()), eros_, SLOT(forefeitMatchmaking()));
 	QObject::connect(this, SIGNAL(uploadReplay(QIODevice*)), eros_, SLOT(uploadReplay(QIODevice*)));
 	QObject::connect(this, SIGNAL(uploadReplay(const QString)), eros_, SLOT(uploadReplay(const QString)));
 
@@ -95,10 +96,10 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	
 	QObject::connect(ui.tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(tabContainer_tabCloseRequested(int)));
 	QObject::connect(ui.lblBottomMenu, SIGNAL(linkActivated(const QString &)), this, SLOT(label_linkActivated(const QString&)));
-	QObject::connect(ui.btnJoinRoom, SIGNAL(pressed()), this, SLOT(btnJoinRoom_pressed()));
+	QObject::connect(ui.btnJoinRoom, SIGNAL(clicked()), this, SLOT(btnJoinRoom_pressed()));
 	QObject::connect(ui.lstChats, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(lstChats_currentItemChanged(QListWidgetItem *, QListWidgetItem *)));
 	QObject::connect(ui.cmbRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbRegion_currentIndexChanged(int)));
-	QObject::connect(ui.btnQueue, SIGNAL(pressed()), this, SLOT(btnQueue_pressed()));
+	QObject::connect(ui.btnQueue, SIGNAL(clicked()), this, SLOT(btnQueue_pressed()));
 	
 
 	this->connection_timer_->setInterval(500);
@@ -155,6 +156,8 @@ void MainWindow::erosMatchmakingStateChanged(ErosMatchmakingState status)
 }
 void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 {
+	setQueueState(true);
+	
 	this->matchmaking_timer_->stop();
 	int regionIndex = ui.cmbRegion->currentData().toInt();
 	ErosRegion region = eros_->activeRegions()[regionIndex];
@@ -173,8 +176,11 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 	ui.frmMatchmakingOpponent->layout()->addWidget(region_info);
 
 	ui.lblVS->setText("VS");
-	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a> (join SC2 channel %4)").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName(), match->battleNetChannel());
+	ui.lblVS->setMaximumHeight(9999);
+	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
 	ui.lblMapInfo->setText(map);
+	ui.lblMapInfo->setMaximumHeight(9999);
+	ui.btnQueue->setText(tr("Forefeit Match"));
 }
 
 void MainWindow::matchmakingTimerWorker()
@@ -243,8 +249,11 @@ void MainWindow::btnQueue_pressed()
 		}
 		else if (eros_->matchmakingState() == ErosMatchmakingState::Matched)
 		{
-			setQueueState(false);
-			QMessageBox::information(this, "Oh snap :(", "This doesn't exist yet. You've been placed back into an unqueued state.");
+			QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Confirm Forefeit"), tr("Are you sure you want to forefeit?"), QMessageBox::Yes | QMessageBox::No);	
+			if (reply == QMessageBox::StandardButton::Yes)
+			{
+				emit forefeitMatchmaking();
+			}
 		}
 	}
 }
@@ -506,7 +515,6 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 	}
 	ui.tabContainer->setCurrentIndex(id);
 
-	ui.btnQueue->setText(tr("Forefeit Match"));
 }
 void MainWindow::erosChatRoomLeft(ChatRoom *room)
 {

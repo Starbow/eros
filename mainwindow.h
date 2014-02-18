@@ -77,6 +77,7 @@ signals:
 	// Matchmaking slots
 	void queueMatchmaking(ErosRegion region, int search_radius);
 	void dequeueMatchmaking();
+	void forefeitMatchmaking();
 
 	// Chat slots
 	void sendMessage(ChatRoom *room, const QString message);
