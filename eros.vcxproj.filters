@@ -113,6 +113,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_bnetsettingswindow.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="crashhandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -182,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_bnetsettingswindow.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="crashhandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

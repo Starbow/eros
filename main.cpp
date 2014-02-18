@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "CrashHandler.h"
 #include <QtWidgets/QApplication>
 #include <QThread>
 
@@ -10,6 +11,13 @@ int main(int argc, char *argv[])
 	a.setApplicationName("Eros");
 	a.setApplicationDisplayName("Eros");
 	
+	#if defined(Q_OS_WIN32)
+		CrashHandler::instance()->Init(QCoreApplication::applicationDirPath());
+	#elif defined(Q_OS_LINUX)
+		CrashHandler::instance()->Init(QCoreApplication::applicationDirPath());
+	#elif defined(Q_OS_MAC)
+		CrashHandler::instance()->Init(QCoreApplication::applicationDirPath());
+	#endif
 	Eros *eros = new Eros(0);
 	QThread *erosThread = new QThread();
 	eros->moveToThread(erosThread);
