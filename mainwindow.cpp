@@ -3,11 +3,15 @@
 #include <QFontDatabase>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFile>
 #include <QStandardPaths>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 #include "chatwidget.h"
 #include "matchmakingplayerinfo.h"
 #include "matchmakingsearchprogresswidget.h"
 
+#define EROS_CURRENT_VERSION = 1
 
 MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	: QMainWindow(parent)
@@ -20,6 +24,19 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QFontDatabase::addApplicationFont(":/font/Gobold");
 	QFontDatabase::addApplicationFont(":/font/Gobold-bold");
 
+
+	QFile version(":/data/version_info");
+	if(!version.open(QIODevice::ReadOnly))
+	{
+		this->local_version_ = 1;
+	}
+	else
+	{
+		QByteArray data = version.readAll();
+		QStringList tokens = QString::fromLocal8Bit(data).split('|');
+		this->local_version_ = tokens[0].toInt();
+		version.close();
+	}
 	ui.setupUi(this);
 	delete ui.lblLocalPlaceholder;
 	delete ui.lblRemotePlaceholder;
@@ -33,22 +50,15 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->matchmaking_start_ = new QTime();
 	this->watcher_ = new QSimpleFileWatcher(this);
 	this->watches_ = QList<WatchID>();
-
-	// The user should be prevented from emptying invalid values in the settings dialog.
-	if (this->config_->profiles().count() == 0)
-	{
-		QMessageBox::information(this, "Eros", tr("Welcome to Eros! You need to configure some settings in order to continue. The options window will now open."));
-		this->settings_window_ = new SettingsWindow(this, this->config_);
-		int result = settings_window_->exec();
-		delete settings_window_;
-	}
-
-	// timers
-	QObject::connect(this->connection_timer_, SIGNAL(timeout()), this, SLOT(connectionTimerWorker()));
-	QObject::connect(this->matchmaking_timer_, SIGNAL(timeout()), this, SLOT(matchmakingTimerWorker()));
+	this->update_checker_nam_ = new QNetworkAccessManager(this);
+	this->update_timer_ = new QTimer(this);
 
 	// File watcher
 	QObject::connect(this->watcher_, SIGNAL(fileAction(WatchID, const QString &, const QString &, Action )), this, SLOT(fileAction(WatchID, const QString &, const QString, Action)));
+
+	// Update checker
+	QObject::connect(update_checker_nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(updateCheckerFinished(QNetworkReply*)));
+	QObject::connect(this->update_timer_, SIGNAL(timeout()), this, SLOT(updateCheckerTimerWorker()));
 
 	// Set up Eros signals
 	/// Eros Signals
@@ -63,7 +73,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(localUserUpdated(LocalUser*)), this, SLOT(erosLocalUserUpdated(LocalUser*)));
 	QObject::connect(eros_, SIGNAL(matchmakingStateChanged(ErosMatchmakingState)), this, SLOT(erosMatchmakingStateChanged(ErosMatchmakingState)));
 	QObject::connect(eros_, SIGNAL(matchmakingMatchFound(MatchmakingMatch *)), this, SLOT(erosMatchmakingMatchFound(MatchmakingMatch *)));
-	QObject::connect(eros_, SIGNAL(regionStatsUpdated(ErosRegion, int)), this, SLOT(erosRegionStatsUpdated(ErosRegion, int)));
+	//QObject::connect(eros_, SIGNAL(regionStatsUpdated(ErosRegion, int)), this, SLOT(erosRegionStatsUpdated(ErosRegion, int)));
+	QObject::connect(eros_, SIGNAL(statsUpdated(int, int)), this, SLOT(erosStatsUpdated(int, int)));
 	QObject::connect(eros_, SIGNAL(replayUploadError(ErosError)), this, SLOT(erosReplayUploadError(ErosError)));
 	QObject::connect(eros_, SIGNAL(replayUploaded()), this, SLOT(erosReplayUploaded()));
 	QObject::connect(eros_, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(erosUploadProgress(qint64, qint64)));
@@ -82,8 +93,11 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this, SIGNAL(uploadReplay(const QString)), eros_, SLOT(uploadReplay(const QString)));
 
 
-	
 
+
+	// timers
+	QObject::connect(this->connection_timer_, SIGNAL(timeout()), this, SLOT(connectionTimerWorker()));
+	QObject::connect(this->matchmaking_timer_, SIGNAL(timeout()), this, SLOT(matchmakingTimerWorker()));
 
 	// UI Stuff
 	settings_window_ = nullptr;
@@ -102,15 +116,51 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(ui.cmbRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbRegion_currentIndexChanged(int)));
 	QObject::connect(ui.btnQueue, SIGNAL(clicked()), this, SLOT(btnQueue_pressed()));
 	
+		// The user should be prevented from emptying invalid values in the settings dialog.
+	if (this->config_->profiles().count() == 0)
+	{
+		QMessageBox::information(this, "Eros", tr("Welcome to Eros! You need to configure some settings in order to continue. The options window will now open."));
+		openSettings();
+	}
+	else
+	{
+		this->connection_timer_->setInterval(500);
+		this->connection_timer_->start();
+	}
 
-	this->connection_timer_->setInterval(500);
-	this->connection_timer_->start();
+	QTimer::singleShot(0, this, SLOT(updateCheckerTimerWorker()));
+	this->update_timer_->setInterval(1000 * 60 * 10);
+	this->update_timer_->start();
 }
 
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::updateCheckerTimerWorker()
+{
+	QUrl url("http://www.starbowmod.com/static/version.txt");
+	QNetworkReply* reply = this->update_checker_nam_->get(QNetworkRequest(url));
+}
+
+void MainWindow::updateCheckerFinished(QNetworkReply* reply)
+{
+	if (reply->error() == QNetworkReply::NoError)
+	{
+		QByteArray data = reply->readAll();
+		QStringList tokens = QString::fromLocal8Bit(data).split('|');
+		if (tokens.count() == 3)
+		{
+			int version = tokens[0].toInt();
+			if (version > this->local_version_)
+			{
+				ui.lblUpdateInfo->setText(tr("<strong>Update:</strong> <a href=\"%1\">%2</a>").arg(tokens[2], tokens[1]));
+				ui.lblUpdateInfo->setMaximumHeight(8888);
+			}
+		}
+	}
 }
 
 void MainWindow::refreshChatRoomList()
@@ -137,6 +187,14 @@ void MainWindow::erosRegionStatsUpdated(ErosRegion region, int count)
 		ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(count));
 	}
 }
+
+void MainWindow::erosStatsUpdated(int online, int searching)
+{
+
+	ui.lblRegionStats->setText(tr("%1 people currently online.").arg(online));
+	
+}
+
 
 void MainWindow::erosMatchmakingStateChanged(ErosMatchmakingState status)
 {
@@ -204,7 +262,8 @@ void MainWindow::setQueueState(bool queueing)
 		this->matchmaking_timer_->start();
 
 
-		MatchmakingSearchProgressWidget *search = new MatchmakingSearchProgressWidget(this);
+		MatchmakingSearchProgressWidget *search = new MatchmakingSearchProgressWidget(this->eros_->activeUserCount(), this->eros_->searchingUserCount(), this);
+		QObject::connect(this->eros_, SIGNAL(statsUpdated(int, int)), search, SLOT(statsUpdated(int, int)));
 		ui.frmMatchmakingOpponent->layout()->addWidget(search);
 		ui.lblVS->setText("00:00");
 		ui.lblVS->setMaximumHeight(16777215);
@@ -265,7 +324,6 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 	LocalUser *user = eros_->localUser();
 	int regionIndex = ui.cmbRegion->currentData().toInt();
 	ErosRegion region = eros_->activeRegions()[regionIndex];
-	this->config_->setPreferredRegion(region);
 
 	if (user != nullptr)
 	{
@@ -283,7 +341,7 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 
 	}
 
-	ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(eros_->regionSearchingUserCount(region)));
+	//ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(eros_->regionSearchingUserCount(region)));
 }
 
 void MainWindow::erosConnected()
@@ -320,8 +378,7 @@ void MainWindow::erosDisconnected()
 
 void MainWindow::erosHandshakeFailed()
 {
-	this->connection_timer_->stop();
-	ui.lblInformation->setText(tr("Authentication failed. Check your token."));
+	ui.lblInformation->setText(tr("Authentication failed. Server error if you previously connected fine."));
 }
 
 
@@ -393,24 +450,7 @@ void MainWindow::label_linkActivated(const QString &link)
 {
 	if (link == "#options")
 	{
-		if (this->settings_window_ == nullptr)
-		{
-			this->settings_window_ = new SettingsWindow(this, this->config_);
-			QObject::connect(this->settings_window_, SIGNAL(profileChanged()), this, SLOT(activeProfileChanged()));
-			ui.tabContainer->insertTab(2, this->settings_window_, "Settings");
-			ui.tabContainer->setCurrentIndex(2);
-		} 
-		else
-		{
-			for (int i = 0; i < ui.tabContainer->count(); i++)
-			{
-				if (ui.tabContainer->widget(i) == this->settings_window_)
-				{
-					ui.tabContainer->setCurrentIndex(i);
-				}
-			}
-		}
-
+		openSettings();
 	}
 	else if (link == "#upload")
 	{
@@ -585,6 +625,27 @@ void MainWindow::openBnetSettings()
 		for (int i = 0; i < ui.tabContainer->count(); i++)
 		{
 			if (ui.tabContainer->widget(i) == bnetsettings_window_)
+			{
+				ui.tabContainer->setCurrentIndex(i);
+			}
+		}
+	}
+}
+
+void MainWindow::openSettings()
+{
+	if (this->settings_window_ == nullptr)
+	{
+		this->settings_window_ = new SettingsWindow(this, this->config_);
+		QObject::connect(this->settings_window_, SIGNAL(profileChanged()), this, SLOT(activeProfileChanged()));
+		ui.tabContainer->insertTab(2, this->settings_window_, "Settings");
+		ui.tabContainer->setCurrentIndex(2);
+	} 
+	else
+	{
+		for (int i = 0; i < ui.tabContainer->count(); i++)
+		{
+			if (ui.tabContainer->widget(i) == this->settings_window_)
 			{
 				ui.tabContainer->setCurrentIndex(i);
 			}

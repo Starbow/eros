@@ -1,9 +1,10 @@
 #include "matchmakingsearchprogresswidget.h"
 
-MatchmakingSearchProgressWidget::MatchmakingSearchProgressWidget(QWidget *parent)
+MatchmakingSearchProgressWidget::MatchmakingSearchProgressWidget(int initial_online, int initial_searching, QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
+	statsUpdated(initial_online, initial_searching);
 	this->timer_ = new QTimer(this);
 	this->ticks_ = 0;
 	QObject::connect(this->timer_, SIGNAL(timeout()), this, SLOT(timerElapsed()));
@@ -14,6 +15,12 @@ MatchmakingSearchProgressWidget::MatchmakingSearchProgressWidget(QWidget *parent
 MatchmakingSearchProgressWidget::~MatchmakingSearchProgressWidget()
 {
 
+}
+
+void MatchmakingSearchProgressWidget::statsUpdated(int active, int searching)
+{
+	ui.lblOnline->setText(tr("%1 online").arg(active));
+	ui.lblSearching->setText(tr("%1 searching").arg(searching));
 }
 
 void MatchmakingSearchProgressWidget::timerElapsed()

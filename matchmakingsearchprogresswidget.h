@@ -10,11 +10,12 @@ class MatchmakingSearchProgressWidget : public QWidget
 	Q_OBJECT
 
 public:
-	MatchmakingSearchProgressWidget(QWidget *parent = 0);
+	MatchmakingSearchProgressWidget(int active, int searching, QWidget *parent = 0);
 	~MatchmakingSearchProgressWidget();
 private slots:
 	void timerElapsed();
-
+public slots:
+	void statsUpdated(int active, int searching);
 private:
 	Ui::MatchmakingSearchProgressWidget ui;
 	QTimer *timer_;

@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QTimer>
+#include <QNetworkAccessManager>
 #include <qsimplefilewatcher.h>
 
 #include "config.h"
@@ -44,7 +45,7 @@ private slots:
 	void matchmakingTimerWorker();
 
 	void openBnetSettings();
-
+	void openSettings();
 
 	// Eros Slots
 	void erosStateChanged(ErosState state);
@@ -66,11 +67,16 @@ private slots:
 	void erosMatchmakingStateChanged(ErosMatchmakingState status);
 	void erosMatchmakingMatchFound(MatchmakingMatch *match);
 	void erosRegionStatsUpdated(ErosRegion region, int searching);
+	void erosStatsUpdated(int active, int searching);
 	void erosReplayUploaded();
 	void erosReplayUploadError(ErosError error);
 	void erosUploadProgress(qint64 written, qint64 total);
 	void fileAction(WatchID watchId, const QString &dir, const QString &filename, Action action);
 
+
+	// Update checker
+	void updateCheckerFinished(QNetworkReply*);
+	void updateCheckerTimerWorker();
 signals:
 	// Connectivity slots
 	void connectToEros(const QString server, const QString username, const QString password);
@@ -103,18 +109,20 @@ private:
 
 	QTimer *connection_timer_;
 	QTimer *matchmaking_timer_;
+	QTimer *update_timer_;
 	QTime *matchmaking_start_;
 	QString configPath_;
 	Eros *eros_;
 	Config *config_;
 	SettingsWindow *settings_window_;
 	BnetSettingsWindow *bnetsettings_window_;
+	QNetworkAccessManager *update_checker_nam_;
 	QString username_;
 	QString authtoken_;
 	QString server_;
 	QSimpleFileWatcher *watcher_;
 	QList<WatchID> watches_;
-
+	int local_version_;
 
 	void clearWatches();
 	void setupWatches();
