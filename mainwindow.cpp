@@ -567,13 +567,16 @@ void MainWindow::openBnetSettings()
 
 void MainWindow::erosReplayUploaded()
 {
-	QMessageBox::information(this, tr("Replay Uploaded Successfully."), tr("Your replay was successfully uploaded. In future more match info will be available to the client."));
+	//QMessageBox::information(this, tr("Replay Uploaded Successfully."), tr("Your replay was successfully uploaded. In future more match info will be available to the client."));
 	setQueueState(false);
 }
 
 void MainWindow::erosReplayUploadError(ErosError error)
 {
-	QMessageBox::warning(this, tr("Replay Upload Error"), tr("Error uploading the replay.\nError %1: %2").arg(QString::number(error), Eros::errorString(error)));
+	if (error != 301)
+	{
+		QMessageBox::warning(this, tr("Replay Upload Error"), tr("Error uploading the replay.\nError %1: %2").arg(QString::number(error), Eros::errorString(error)));
+	}
 }
 
 void MainWindow::erosUploadProgress(qint64 written, qint64 total)
