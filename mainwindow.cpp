@@ -637,6 +637,16 @@ void MainWindow::fileAction(WatchID watchId, const QString &dir, const QString &
 		{
 			ui.lblInformation->setText(tr("Uploading %1").arg(filename));
 			QString path = dir + "/" + filename;
+
+			QTime time;
+			time.start();
+
+			while (time.elapsed() < 10000)
+			{
+				// Ugly delay hack.
+				QCoreApplication::processEvents();
+			}
+
 			uploadReplay(path);		
 		}
 	}
