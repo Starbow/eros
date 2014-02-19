@@ -49,6 +49,7 @@ private slots:
 
 	// Eros Slots
 	void erosStateChanged(ErosState state);
+	void erosConnectionError(QAbstractSocket::SocketError, const QString error_string);
 	void erosConnected();
 	void erosDisconnected();
 	void erosHandshakeFailed();

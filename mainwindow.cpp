@@ -37,7 +37,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 		this->local_version_ = tokens[0].toInt();
 		version.close();
 	}
+
 	ui.setupUi(this);
+	this->setWindowTitle(tr("Alpha version %1").arg(this->local_version_));
 	delete ui.lblLocalPlaceholder;
 	delete ui.lblRemotePlaceholder;
 
@@ -63,6 +65,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	// Set up Eros signals
 	/// Eros Signals
 	QObject::connect(eros_, SIGNAL(stateChanged(ErosState)), this, SLOT(erosStateChanged(ErosState)));
+	QObject::connect(eros_, SIGNAL(connectionError(QAbstractSocket::SocketError, const QString)), this, SLOT(erosConnectionError(QAbstractSocket::SocketError, const QString)));
 	QObject::connect(eros_, SIGNAL(connected()), this, SLOT(erosConnected()));
 	QObject::connect(eros_, SIGNAL(disconnected()), this, SLOT(erosDisconnected()));
 	QObject::connect(eros_, SIGNAL(handshakeFailed()), this, SLOT(erosHandshakeFailed()));
@@ -342,6 +345,11 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 	}
 
 	//ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(eros_->regionSearchingUserCount(region)));
+}
+
+void MainWindow::erosConnectionError(QAbstractSocket::SocketError error, const QString error_string)
+{
+	ui.lblInformation->setText(tr("Connection error (%1): %2").arg(QString::number(error), error_string));
 }
 
 void MainWindow::erosConnected()
