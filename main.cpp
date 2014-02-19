@@ -1,5 +1,5 @@
-#include "MainWindow.h"
-#include "CrashHandler.h"
+#include "mainwindow.h"
+#include "crashhandler.h"
 #include <QtWidgets/QApplication>
 #include <QThread>
 
