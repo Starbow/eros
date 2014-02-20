@@ -91,7 +91,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 
 	QObject::connect(this, SIGNAL(queueMatchmaking(ErosRegion, int)), eros_, SLOT(queueMatchmaking(ErosRegion, int)));
 	QObject::connect(this, SIGNAL(dequeueMatchmaking()), eros_, SLOT(dequeueMatchmaking()));
-	QObject::connect(this, SIGNAL(forefeitMatchmaking()), eros_, SLOT(forefeitMatchmaking()));
+    QObject::connect(this, SIGNAL(forfeitMatchmaking()), eros_, SLOT(forfeitMatchmaking()));
 	QObject::connect(this, SIGNAL(uploadReplay(QIODevice*)), eros_, SLOT(uploadReplay(QIODevice*)));
 	QObject::connect(this, SIGNAL(uploadReplay(const QString)), eros_, SLOT(uploadReplay(const QString)));
 
@@ -242,7 +242,7 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
 	ui.lblMapInfo->setText(map);
 	ui.lblMapInfo->setMaximumHeight(9999);
-	ui.btnQueue->setText(tr("Forefeit Match"));
+    ui.btnQueue->setText(tr("forfeit Match"));
 }
 
 void MainWindow::matchmakingTimerWorker()
@@ -313,10 +313,10 @@ void MainWindow::btnQueue_pressed()
 		}
 		else if (eros_->matchmakingState() == ErosMatchmakingState::Matched)
 		{
-			QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Confirm Forefeit"), tr("Are you sure you want to forefeit?"), QMessageBox::Yes | QMessageBox::No);	
+            QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Confirm forfeit"), tr("Are you sure you want to forfeit?"), QMessageBox::Yes | QMessageBox::No);
 			if (reply == QMessageBox::StandardButton::Yes)
 			{
-				emit forefeitMatchmaking();
+                emit forfeitMatchmaking();
 			}
 		}
 	}

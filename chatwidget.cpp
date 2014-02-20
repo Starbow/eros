@@ -82,9 +82,18 @@ void ChatWidget::removeUser(User *user)
 	qDeleteAll(this->ui.listUsers->findItems(user->username(), Qt::MatchFlag::MatchExactly));
 }
 
-void ChatWidget::writeLog(QString &data, bool sanitize) 
+void ChatWidget::writeLog(const QString &data, bool sanitize)
 {		
-	ui.txtMessages->append(QString("[%1] %2").arg(QTime::currentTime().toString("HH:mm:ss"), sanitize ? data.replace(QString("<"), QString("&lt;"), Qt::CaseSensitivity::CaseInsensitive) : data));
+    if (sanitize)
+    {
+        QString sanitized(data);
+        sanitized = sanitized.replace("<", "&lt;", Qt::CaseSensitivity::CaseInsensitive);
+        ui.txtMessages->append(QString("[%1] %2").arg(QTime::currentTime().toString("HH:mm:ss"), sanitized));
+    }
+    else
+    {
+        ui.txtMessages->append(QString("[%1] %2").arg(QTime::currentTime().toString("HH:mm:ss"), data));
+    }
     ui.txtMessages->verticalScrollBar()->setValue(ui.txtMessages->verticalScrollBar()->maximum());
 }
 

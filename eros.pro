@@ -16,6 +16,7 @@ SOURCES += main.cpp\
         mainwindow.cpp\
         bnetsettingswindow.cpp\
         chatwidget.cpp\
+        crashhandler.cpp\
         config.cpp\
         matchmakingplayerinfo.cpp\
         matchmakingsearchprogresswidget.cpp\
@@ -26,6 +27,7 @@ HEADERS  += main.h\
         mainwindow.h\
         bnetsettingswindow.h\
         chatwidget.h\
+        crashhandler.h\
         config.h\
         matchmakingplayerinfo.h\
         matchmakingsearchprogresswidget.h\
@@ -46,7 +48,6 @@ FORMS    += mainwindow.ui\
 RESOURCES += \
     resources.qrc
 
-CONFIG += c++11
 
 OTHER_FILES +=
 
@@ -54,8 +55,11 @@ macx {
     LIBS += -L/usr/local/lib/
     INCLUDEPATH += /usr/local/include/
 }
-
-LIBS += -lprotobuf -lQSimpleFileWatcher -leros
+linux {
+    INCLUDEPATH += /opt/google-breakpad/src/
+    QMAKE_CXXFLAGS += -std=gnu++0x
+}
+LIBS += -lbreakpad_client -lQSimpleFileWatcher -leros -lprotobuf
 
 
 

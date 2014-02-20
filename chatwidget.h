@@ -19,7 +19,7 @@ public:
 
 	User *user() const;
 	ChatRoom *chatroom() const;
-	void writeLog(QString &data, bool sanitize = true);
+    void writeLog(const QString &data, bool sanitize = true);
 
 private:
 	Ui::ChatWidget ui;
