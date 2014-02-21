@@ -74,6 +74,7 @@ void ChatWidget::addUser(User *user)
 {
 	writeLog(QString(tr("%1 has joined the chat.")).arg(user->username()));
 	this->ui.listUsers->addItem(user->username());
+	this->ui.listUsers->sortItems();
 }
 
 void ChatWidget::removeUser(User *user)
