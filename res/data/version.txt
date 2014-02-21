@@ -1,1 +1,1 @@
-1|alpha v0.1|http://www.starbowmod.com/
+3|alpha v0.1.3|http://www.starbowmod.com/

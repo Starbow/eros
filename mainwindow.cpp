@@ -629,9 +629,12 @@ void MainWindow::erosConnected()
 		ui.cmbRegion->setCurrentIndex(set_index);
 
 	erosLocalUserUpdated(this->eros_->localUser());
-
+	if (this->config_->autoJoin())
+	{
+		ChatRoom *room = this->eros_->getChatRoom("Starbow");
+		emit joinChatRoom(room);
+	}
 	setUiEnabled(true);
-	
 }
 
 void MainWindow::erosDisconnected()

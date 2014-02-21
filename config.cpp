@@ -1,6 +1,6 @@
 #include "config.h"
 
-#define EROS_DEFAULT_SERVER "eros.starbowmod.com"
+#define EROS_DEFAULT_SERVER "eros.starbowmod.com:1337"
 
 Config::Config(QObject *parent)
 	: QObject(parent)
@@ -59,6 +59,10 @@ int Config::preferredRegion() const
 {
 	return this->preferred_region_;
 }
+bool Config::autoJoin() const
+{
+	return this->settings_->value("autojoin", true).toBool();
+}
 
 void Config::setActiveProfile(Profile * profile)
 {
@@ -74,6 +78,11 @@ void Config::setStartOnLogin(bool start)
 	this->start_on_login_ = start;
 
 	// perhaps put the relevant registy / whatever mac has entries here
+}
+
+void Config::setAutoJoin(bool join)
+{
+	this->settings_->setValue("autojoin", join);
 }
 
 void Config::setPreferredRegion(int region)

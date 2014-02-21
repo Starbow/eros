@@ -22,11 +22,13 @@ public:
 	const QString &server() const;
 	int preferredRegion() const;
 	bool trayNotificationShown() const;
+	bool autoJoin() const;
 
 	void setActiveProfile(Profile *);
 	void setStartOnLogin(bool);
 	void setPreferredRegion(int);
 	void setTrayNotificationShown(bool);
+	void setAutoJoin(bool);
 
 	Profile *createProfile(const QString &username);
 	void removeProfile(Profile *profile);
@@ -39,6 +41,7 @@ private:
 	QString server_;
 	int preferred_region_;
 	bool tray_notification_shown_;
+	
 
 signals:
 	void activeProfileChanged(Profile *profile);

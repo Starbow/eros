@@ -161,15 +161,19 @@ void SettingsWindow::btnSetToken_click()
 	bool ok;
 	QString token = QInputDialog::getText(this, tr("Eros authentication token"), tr("Please enter your authentication token. This can be found on your starbowmod.com profile."), QLineEdit::Normal,"",&ok);	
 	
-	if(token.isEmpty() == false && ok == true)
+	if(!token.isEmpty() && ok)
 	{
-		this->config_->activeProfile()->setToken(token);
-		emit profileChanged();
+		if (token.trimmed().length() == 30) 
+		{
+			this->config_->activeProfile()->setToken(token.trimmed());
+			emit profileChanged();
+		}
+		else
+		{
+			QMessageBox::critical(this, tr("Bad token"), tr("Authentication tokens are 30 characters long. Please ensure you have copied all of the token in to the input box."), QMessageBox::Ok);
+		}
 	}
-	else
-	{
-		QMessageBox::critical(this, tr("Bad token"), tr("Please note that you will not be able to play ranked games if you do not provide a valid authentication token."), QMessageBox::Ok);
-	}
+	
 }
 
 void SettingsWindow::reconnectGUI()
@@ -178,23 +182,23 @@ void SettingsWindow::reconnectGUI()
 	this->disconnect(ui.cmbProfiles,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbProfiles_changed()));
 	this->disconnect(ui.btnNewProfile,     SIGNAL(clicked()), this, SLOT(btnNewProfile_click()));
 	this->disconnect(ui.btnDeleteProfile,  SIGNAL(clicked()), this, SLOT(btnDeleteProfile_click()));
-	//this->disconnect(ui.btnOK,             SIGNAL(clicked()), this, SLOT(btnOK_click()));
 	this->disconnect(ui.btnSetToken,       SIGNAL(clicked()), this, SLOT(btnSetToken_click()));
 	this->disconnect(ui.cmbSearchRange,    SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbSearchRange_changed()));
 	this->disconnect(ui.cmbAutostart,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbAutostart_changed()));
 	this->disconnect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->disconnect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
+//	this->disconnect(ui.chkAutoJoin,       SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 
 	this->connect(ui.cmbProfiles,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbProfiles_changed()));
 	this->connect(ui.btnNewProfile,     SIGNAL(clicked()), this, SLOT(btnNewProfile_click()));
 	this->connect(ui.btnDeleteProfile,  SIGNAL(clicked()), this, SLOT(btnDeleteProfile_click()));
-//	this->connect(ui.btnOK,             SIGNAL(clicked()), this, SLOT(btnOK_click()));
 	this->connect(ui.btnSetToken,       SIGNAL(clicked()), this, SLOT(btnSetToken_click()));
 	this->connect(ui.btnSelectWatchFolder,       SIGNAL(clicked()), this, SLOT(btnSelectWatchFolder_click()));
 	this->connect(ui.cmbSearchRange,    SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbSearchRange_changed()));
 	this->connect(ui.cmbAutostart,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbAutostart_changed()));
 	this->connect(ui.cmbChatLinks,      SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbChatLinks_changed()));
 	this->connect(ui.cmbLanguage,       SIGNAL(currentIndexChanged(const QString)), this, SLOT(cmbLanguage_changed()));
+//	this->connect(ui.chkAutoJoin,       SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 }
 
 bool SettingsWindow::profileExists(QString profileName)
@@ -288,6 +292,11 @@ void SettingsWindow::refreshProfileInterface()
 	ui.cmbChatLinks->setCurrentIndex(ui.cmbChatLinks->findText(boolToYesNo(this->config_->activeProfile()->chatLinks())));
 	ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findText(this->config_->activeProfile()->language()));
 	ui.txtWatchFolder->setText(this->config_->activeProfile()->replayFolder());
+}
+
+void SettingsWindow::chkAutoJoin_stateChanged(int state)
+{
+	this->config_->setAutoJoin(state == Qt::CheckState::Checked);
 }
 
 const short int SettingsWindow::searchRangeToInt(QString searchRange)

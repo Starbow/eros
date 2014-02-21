@@ -22,6 +22,7 @@ private slots:
 	void cmbAutostart_changed();
 	void cmbChatLinks_changed();
 	void cmbLanguage_changed();
+	void chkAutoJoin_stateChanged(int);
 
 	void cmbProfiles_changed();
 	void btnOK_click();
