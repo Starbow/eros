@@ -50,10 +50,31 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->matchmaking_timer_ = new QTimer(this);
 	this->matchmaking_timer_->setInterval(500);
 	this->matchmaking_start_ = new QTime();
+	this->matchmaking_result_time_ = new QTime();
+	this->long_process_start_time_ = new QTime();
 	this->watcher_ = new QSimpleFileWatcher(this);
 	this->watches_ = QList<WatchID>();
 	this->update_checker_nam_ = new QNetworkAccessManager(this);
 	this->update_timer_ = new QTimer(this);
+	this->long_process_timer_ = new QTimer(this);
+	this->tray_icon_ = new QSystemTrayIcon(this);
+	this->tray_icon_menu_ = new QMenu(this);
+	
+	tray_icon_action_show_ = new QAction("Hide Eros", this);
+	tray_icon_action_close_ = new QAction("Close Eros", this);
+
+
+	QObject::connect(tray_icon_action_show_, SIGNAL(triggered()), this, SLOT(toggleWindow()));
+    QObject::connect(tray_icon_action_close_, SIGNAL(triggered()), qApp, SLOT(quit()));
+	QObject::connect(this->tray_icon_, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayIconClicked(QSystemTrayIcon::ActivationReason)));
+
+
+	this->tray_icon_->setIcon(QIcon(":/img/client/icons/bow"));
+	this->tray_icon_menu_->addAction(tray_icon_action_show_);
+	this->tray_icon_menu_->addAction(tray_icon_action_close_);
+	this->tray_icon_->setContextMenu(this->tray_icon_menu_);
+
+
 
 	// File watcher
 	QObject::connect(this->watcher_, SIGNAL(fileAction(WatchID, const QString &, const QString &, Action )), this, SLOT(fileAction(WatchID, const QString &, const QString, Action)));
@@ -69,6 +90,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(connected()), this, SLOT(erosConnected()));
 	QObject::connect(eros_, SIGNAL(disconnected()), this, SLOT(erosDisconnected()));
 	QObject::connect(eros_, SIGNAL(handshakeFailed()), this, SLOT(erosHandshakeFailed()));
+	QObject::connect(eros_, SIGNAL(broadcastAlert(const QString, int)), this, SLOT(erosBroadcastAlert(const QString, int)));
 	QObject::connect(eros_, SIGNAL(chatRoomAdded(ChatRoom*)), this, SLOT(erosChatRoomAdded(ChatRoom*)));
 	QObject::connect(eros_, SIGNAL(chatRoomRemoved(ChatRoom*)), this, SLOT(erosChatRoomRemoved(ChatRoom*)));
 	QObject::connect(eros_, SIGNAL(chatRoomJoined(ChatRoom*)), this, SLOT(erosChatRoomJoined(ChatRoom*)));
@@ -82,6 +104,15 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(replayUploaded()), this, SLOT(erosReplayUploaded()));
 	QObject::connect(eros_, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(erosUploadProgress(qint64, qint64)));
 
+	QObject::connect(eros_, SIGNAL(longProcessStateChanged(ErosLongProcessState)), this, SLOT(erosLongProcessStateChanged(ErosLongProcessState)));
+	QObject::connect(eros_, SIGNAL(drawRequested()), this, SLOT(erosDrawRequested()));
+	QObject::connect(eros_, SIGNAL(drawRequestFailed()), this, SLOT(erosDrawRequestFailed()));
+	QObject::connect(eros_, SIGNAL(noShowRequested()), this, SLOT(erosNoShowRequested()));
+	QObject::connect(eros_, SIGNAL(noShowRequestFailed()), this, SLOT(erosNoShowRequestFailed()));
+	QObject::connect(eros_, SIGNAL(acknowledgeLongProcessFailed()), this, SLOT(erosAcknowledgeLongProcessFailed()));
+	QObject::connect(eros_, SIGNAL(acknowledgedLongProcess()), this, SLOT(erosAcknowledgedLongProcess()));
+
+
 	/// Eros Slots
 	QObject::connect(this, SIGNAL(connectToEros(const QString, const QString, const QString)), eros_, SLOT(connectToEros(const QString, const QString, const QString)));
 	QObject::connect(this, SIGNAL(disconnectFromEros()), eros_, SLOT(disconnectFromEros()));
@@ -92,15 +123,22 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this, SIGNAL(queueMatchmaking(ErosRegion, int)), eros_, SLOT(queueMatchmaking(ErosRegion, int)));
 	QObject::connect(this, SIGNAL(dequeueMatchmaking()), eros_, SLOT(dequeueMatchmaking()));
     QObject::connect(this, SIGNAL(forfeitMatchmaking()), eros_, SLOT(forfeitMatchmaking()));
+
 	QObject::connect(this, SIGNAL(uploadReplay(QIODevice*)), eros_, SLOT(uploadReplay(QIODevice*)));
 	QObject::connect(this, SIGNAL(uploadReplay(const QString)), eros_, SLOT(uploadReplay(const QString)));
 
+	QObject::connect(this, SIGNAL(requestDraw()), eros_, SLOT(requestDraw()));
+	QObject::connect(this, SIGNAL(requestNoShow()), eros_, SLOT(requestNoShow()));
+	QObject::connect(this, SIGNAL(acknowledgeLongProcess(bool)), eros_, SLOT(acknowledgeLongProcess(bool)));
 
 
 
 	// timers
 	QObject::connect(this->connection_timer_, SIGNAL(timeout()), this, SLOT(connectionTimerWorker()));
 	QObject::connect(this->matchmaking_timer_, SIGNAL(timeout()), this, SLOT(matchmakingTimerWorker()));
+	QObject::connect(this->long_process_timer_, SIGNAL(timeout()), this, SLOT(longProcessTimerWorker()));
+
+	this->long_process_timer_->setInterval(250);
 
 	// UI Stuff
 	settings_window_ = nullptr;
@@ -111,14 +149,20 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
     ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
     ui.tabContainer->tabBar()->tabButton(1, QTabBar::RightSide)->resize(0, 0);
 #endif
+	ui.tabContainer->tabBar()->setUsesScrollButtons(true);
 	
 	QObject::connect(ui.tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(tabContainer_tabCloseRequested(int)));
 	QObject::connect(ui.lblBottomMenu, SIGNAL(linkActivated(const QString &)), this, SLOT(label_linkActivated(const QString&)));
 	QObject::connect(ui.btnJoinRoom, SIGNAL(clicked()), this, SLOT(btnJoinRoom_pressed()));
 	QObject::connect(ui.lstChats, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(lstChats_currentItemChanged(QListWidgetItem *, QListWidgetItem *)));
+	QObject::connect(ui.lstChats, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(lstChats_itemDoubleClicked(QListWidgetItem*)));
 	QObject::connect(ui.cmbRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbRegion_currentIndexChanged(int)));
 	QObject::connect(ui.btnQueue, SIGNAL(clicked()), this, SLOT(btnQueue_pressed()));
+	QObject::connect(ui.btnDraw, SIGNAL(clicked()), this, SLOT(btnDraw_pressed()));
+	QObject::connect(ui.btnNoShow, SIGNAL(clicked()), this, SLOT(btnNoShow_pressed()));
 	
+
+	this->tray_icon_->show();
 		// The user should be prevented from emptying invalid values in the settings dialog.
 	if (this->config_->profiles().count() == 0)
 	{
@@ -134,12 +178,212 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QTimer::singleShot(0, this, SLOT(updateCheckerTimerWorker()));
 	this->update_timer_->setInterval(1000 * 60 * 10);
 	this->update_timer_->start();
+
+	notification_sound_ = new QSound(":/sound/notification", this);
+	
 }
+
 
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::longProcessTimerWorker()
+{
+	if (this->eros_->matchmakingMatch() != nullptr)
+	{
+		const MatchmakingMatch *match = this->eros_->matchmakingMatch();
+		int secs;
+		int mins;
+		ErosLongProcessState state = this->eros_->longProcessState();
+		switch (state)
+		{
+			case ErosLongProcessState::LongProcessIdle:
+				secs = match->longProcessUnlockTime() - (this->matchmaking_result_time_->elapsed()  / 1000);
+				if (secs <= 0)
+				{
+					this->ui.frmLongProcessInterface->setEnabled(true);
+					this->ui.frmLongProcessButtons->setEnabled(true);
+					this->long_process_timer_->stop();
+					this->ui.lblLongProcess->setText(tr("Abusing these options will result in a ban."));
+				}
+				else
+				{
+					mins = (secs / 60) % 60;
+					secs = secs - (mins * 60);
+					this->ui.lblLongProcess->setText(QString("These options will unlock in %1:%2.").arg(mins,2, 10, QLatin1Char('0')).arg(secs,2,10,QLatin1Char('0')));
+				}
+				break;
+
+			case ErosLongProcessState::DrawRequest:
+			case ErosLongProcessState::FlaggedNoShow:
+			case ErosLongProcessState::OpponentFlaggedDrawRequest:
+			case ErosLongProcessState::OpponentFlaggedNoShow:
+				secs = match->longProcessResponseTime() - (this->long_process_start_time_->elapsed()  / 1000);
+				if (secs <= 0)
+				{
+					this->ui.frmLongProcessInterface->setEnabled(true);
+					this->long_process_timer_->stop();
+					this->ui.lblLongProcess->setText(tr("Response timeout."));
+				}
+				else
+				{
+					mins = (secs / 60) % 60;
+					secs = secs - (mins * 60);
+					if (state == ErosLongProcessState::DrawRequest || state == ErosLongProcessState::FlaggedNoShow)
+					{
+						this->ui.lblLongProcess->setText(QString("Request pending. Auto-yes in %1:%2.").arg(mins,2, 10, QLatin1Char('0')).arg(secs,2,10,QLatin1Char('0')));
+					}
+					else
+					{
+						this->ui.lblLongProcess->setText(QString("Opponent request pending. Auto-yes in %1:%2.").arg(mins,2, 10, QLatin1Char('0')).arg(secs,2,10,QLatin1Char('0')));
+					}
+				}
+		}
+
+		
+
+	}
+	int elapsed = this->matchmaking_result_time_->elapsed() / 1000;
+
+}
+
+void MainWindow::btnDraw_pressed()
+{
+	emit requestDraw();
+}
+void MainWindow::btnNoShow_pressed()
+{
+	emit requestNoShow();
+}
+
+void MainWindow::erosLongProcessStateChanged(ErosLongProcessState state)
+{
+	switch (state)
+	{
+	case ErosLongProcessState::DrawRequest:
+	case ErosLongProcessState::FlaggedNoShow:
+	case ErosLongProcessState::OpponentFlaggedDrawRequest:
+	case ErosLongProcessState::OpponentFlaggedNoShow:
+		this->long_process_start_time_->restart();
+		this->long_process_timer_->start();
+		ui.frmLongProcessButtons->setDisabled(true);
+		break;
+	case ErosLongProcessState::LongProcessIdle:
+		this->ui.lblLongProcess->setText(tr("Abusing these options will result in a ban."));
+		break;
+	}
+}
+void MainWindow::erosDrawRequested()
+{
+	this->showNormal();
+	this->raise();
+	this->activateWindow();
+	this->notification_sound_->setLoops(3);
+	this->notification_sound_->play();
+	QMessageBox::StandardButton result = QMessageBox::critical(this, tr("Draw Request"), tr("Your opponent has requested this game be marked as a draw. Do you wish to accept this request? Clicking yes or not responding will result in this game ending in a draw."), QMessageBox::StandardButton::Yes|QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+	bool response = (result == QMessageBox::StandardButton::Yes);
+	emit acknowledgeLongProcess(response);
+}
+void MainWindow::erosDrawRequestFailed()
+{
+	ui.lblInformation->setText("Draw request failed.");
+}
+void MainWindow::erosNoShowRequested()
+{
+	this->showNormal();
+	this->raise();
+	this->activateWindow();
+	this->notification_sound_->setLoops(3);
+	this->notification_sound_->play();
+	QMessageBox::StandardButton result = QMessageBox::critical(this, tr("Forfeit Request"), tr("Your opponent has flagged you as a no-show. Do you wish to accept this request? Clicking yes or not responding will result in you forfeiting this game."), QMessageBox::StandardButton::Yes|QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+	bool response = (result == QMessageBox::StandardButton::Yes);
+	emit acknowledgeLongProcess(response);
+}
+void MainWindow::erosNoShowRequestFailed()
+{
+
+}
+
+void MainWindow::erosAcknowledgeLongProcessFailed()
+{
+
+}
+
+void MainWindow::erosAcknowledgedLongProcess()
+{
+
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    QMainWindow::changeEvent(event);
+    if(event->type() == QEvent::WindowStateChange) {
+        if(isMinimized())
+            this->hide();
+    }
+}
+ 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	if (this->tray_icon_->isVisible()) {
+		toggleWindow();
+		event->ignore();
+		if (!this->config_->trayNotificationShown())
+		{
+			this->config_->setTrayNotificationShown(true);
+			this->tray_icon_->showMessage("Eros", tr("Eros is still running in the notification tray. Right click the icon if you want to exit."));
+		}
+	}
+}
+
+void MainWindow::toggleWindow()
+{
+	if(this->isVisible())
+	{
+		this->hide();
+		this->tray_icon_action_show_->setText("Show Eros");
+	}
+	else
+	{
+		this->showNormal();
+		this->raise();
+		this->activateWindow();
+		this->tray_icon_action_show_->setText("Hide Eros");
+	}
+}
+ 
+void MainWindow::trayIconClicked(QSystemTrayIcon::ActivationReason reason)
+{
+    if(reason == QSystemTrayIcon::DoubleClick)
+        toggleWindow();
+}
+ 
+
+void MainWindow::erosBroadcastAlert(const QString message, int hint)
+{
+	if (hint == 1)
+	{
+		QMessageBox::information(this, tr("Server Broadcast Message"), tr("The server is shutting down. %1").arg(message));
+	}
+	else if (hint == 2)
+	{
+		QMessageBox::information(this, tr("Server Broadcast Message"), tr("You were forfeited from your matchmaking match by an admin. %1").arg(message));
+	}
+	else if (hint == 3)
+	{
+		QMessageBox::information(this, tr("Server Broadcast Message"), tr("Your opponent was forfeited from your matchmaking match by an admin. %1").arg(message));
+	}
+	else if (hint == 4)
+	{
+		QMessageBox::information(this, tr("Server Broadcast Message"), tr("Your matchmaking match was ended by an admin. %1").arg(message));
+	}
+	else
+	{
+		QMessageBox::information(this, tr("Server Broadcast Message"), message);
+	}
 }
 
 void MainWindow::updateCheckerTimerWorker()
@@ -220,7 +464,10 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 {
 	setQueueState(true);
 	
+	this->matchmaking_result_time_->restart();
 	this->matchmaking_timer_->stop();
+	this->long_process_timer_->start();
+	this->ui.frmLongProcessInterface->setMaximumHeight(400);
 	int regionIndex = ui.cmbRegion->currentData().toInt();
 	ErosRegion region = eros_->activeRegions()[regionIndex];
 
@@ -242,7 +489,14 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
 	ui.lblMapInfo->setText(map);
 	ui.lblMapInfo->setMaximumHeight(9999);
-    ui.btnQueue->setText(tr("forfeit Match"));
+	ui.btnQueue->setText(tr("Forfeit Match"));
+
+	this->showNormal();
+	this->raise();
+	this->activateWindow();
+	this->notification_sound_->setLoops(0);
+	this->notification_sound_->play();
+
 }
 
 void MainWindow::matchmakingTimerWorker()
@@ -274,7 +528,10 @@ void MainWindow::setQueueState(bool queueing)
 	}
 	else
 	{
+		this->long_process_timer_->stop();
 		this->matchmaking_timer_->stop();
+		this->ui.frmLongProcessInterface->setMaximumHeight(0);
+		this->ui.frmLongProcessInterface->setDisabled(true);
 		ui.cmbRegion->setEnabled(true);
 		ui.btnQueue->setText(tr("Queue"));
 		QLayoutItem* item;
@@ -313,10 +570,10 @@ void MainWindow::btnQueue_pressed()
 		}
 		else if (eros_->matchmakingState() == ErosMatchmakingState::Matched)
 		{
-            QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Confirm forfeit"), tr("Are you sure you want to forfeit?"), QMessageBox::Yes | QMessageBox::No);
+			QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Confirm Forfeit"), tr("Are you sure you want to forfeit? This will be recorded as a loss for you and a win for your opponent."), QMessageBox::Yes | QMessageBox::No);	
 			if (reply == QMessageBox::StandardButton::Yes)
 			{
-                emit forfeitMatchmaking();
+				emit forfeitMatchmaking();
 			}
 		}
 	}
@@ -540,8 +797,17 @@ void MainWindow::lstChats_currentItemChanged(QListWidgetItem *current, QListWidg
 	{
 		ui.txtRoomName->setText(current->text());
 	}
+
 }
 
+void MainWindow::lstChats_itemDoubleClicked(QListWidgetItem *item)
+{
+	if (item != nullptr)
+	{
+		ui.txtRoomName->setText(item->text());
+		btnJoinRoom_pressed();
+	}
+}
 void MainWindow::btnJoinRoom_pressed()
 {
 	if (this->eros_->state() == ErosState::ConnectedState)
@@ -692,13 +958,20 @@ void MainWindow::clearWatches()
 }
 void MainWindow::setupWatches()
 {
-	if (this->config_->activeProfile() != nullptr)
-	{
-		const QString &path = this->config_->activeProfile()->replayFolder();
-		if (!path.isEmpty())
+	clearWatches();
+
+	try {
+		if (this->config_->activeProfile() != nullptr)
 		{
-			addWatch(path);
+			const QString &path = this->config_->activeProfile()->replayFolder();
+			if (!path.isEmpty())
+			{
+				addWatch(path);
+			}
 		}
+	} catch (...)
+	{
+		QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to monitor your specified SC2 user folder. Please make sure this application has permission to read it."));
 	}
 }
 

@@ -7,11 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>781</width>
-    <height>484</height>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Eros</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/img/client/icons/bow</normaloff>:/img/client/icons/bow</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">.QFrame
@@ -26,11 +30,6 @@
 #tabChat {
 	background-color: #fff;
 }
-
-#frmMatchmaking {
-
-}
-
 
 ChatWidget {
 	background-color: #fff;
@@ -73,6 +72,7 @@ QTabBar::tab:selected  {
 	color: #000;
 }
 
+
 QComboBox {
 	background: #560d0d;
 	color: #fff;
@@ -85,15 +85,19 @@ QComboBox:editable  {
 }
 
  QGroupBox {
-    border: 1px solid #560d0d;
+    border: 3px solid #560d0d;
 	background-color: #fff;
+	padding-top: 10px;
+    font-size: 14px;
+    font-family: &quot;Gobold Bold&quot;;
  }
 
  QGroupBox::title {
-     padding: 0 3px;
-     background-color:#560d0d;
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 5px;
+	background-color: #560d0d;
 	color: #fff;
-	font-weight: bold;
  }
 
 #frmMatchmaking
@@ -197,11 +201,17 @@ QLineEdit:focus
     </item>
     <item>
      <widget class="QTabWidget" name="tabContainer">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -250,73 +260,6 @@ QLineEdit:focus
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
-            <widget class="QFrame" name="frmMatchmakingOpponent">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>200</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_6">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item row="0" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
-               <widget class="QLabel" name="lblRemotePlaceholder">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>96</width>
-                  <height>96</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="pixmap">
-                 <pixmap resource="resources.qrc">:/img/client/rank_icons/league_1</pixmap>
-                </property>
-                <property name="scaledContents">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
            <item row="0" column="0">
             <widget class="QFrame" name="frmMatchmakingLocal">
              <property name="sizePolicy">
@@ -351,13 +294,13 @@ QLineEdit:focus
                <number>9</number>
               </property>
               <property name="topMargin">
-               <number>8</number>
+               <number>9</number>
               </property>
               <property name="rightMargin">
                <number>9</number>
               </property>
               <property name="bottomMargin">
-               <number>10</number>
+               <number>9</number>
               </property>
               <item row="3" column="0" alignment="Qt::AlignBottom">
                <widget class="QFrame" name="frmQueue">
@@ -528,7 +471,7 @@ QLineEdit:focus
              </layout>
             </widget>
            </item>
-           <item row="0" column="1">
+           <item row="0" column="2">
             <widget class="QFrame" name="frmMatchmakingMatch">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -608,6 +551,182 @@ color: #560d0d;</string>
                    <property name="text">
                     <string>VS</string>
                    </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QFrame" name="frmRemote">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_11">
+              <property name="leftMargin">
+               <number>9</number>
+              </property>
+              <property name="topMargin">
+               <number>9</number>
+              </property>
+              <property name="rightMargin">
+               <number>9</number>
+              </property>
+              <property name="bottomMargin">
+               <number>9</number>
+              </property>
+              <item row="0" column="0" alignment="Qt::AlignTop">
+               <widget class="QFrame" name="frmMatchmakingOpponent">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>200</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_6">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
+                  <widget class="QLabel" name="lblRemotePlaceholder">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>96</width>
+                     <height>96</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="pixmap">
+                    <pixmap resource="resources.qrc">:/img/client/rank_icons/league_1</pixmap>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QFrame" name="frmSpaceWaster_2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QFrame" name="frmLongProcessInterface">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_12">
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="lblLongProcess">
+                   <property name="text">
+                    <string>These options unlock in %s.</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QFrame" name="frmLongProcessButtons">
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_2">
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="btnNoShow">
+                      <property name="text">
+                       <string>Report No-show</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnDraw">
+                      <property name="text">
+                       <string>Offer Draw</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                 </layout>

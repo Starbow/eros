@@ -22,6 +22,7 @@ Config::Config(QObject *parent)
 	int active_profile_id = this->settings_->value("activeprofile", 0).toInt();
 	this->start_on_login_ = this->settings_->value("startonlogin", false).toBool();
 	this->preferred_region_ = this->settings_->value("preferredregion", 1).toInt();
+	this->tray_notification_shown_ = this->settings_->value("traynotificationshown", false).toBool();
 
 	if (active_profile_id > 0 && active_profile_id <= this->profiles_.count())
 	{
@@ -109,4 +110,15 @@ Profile *Config::createProfile(const QString &username)
 void Config::removeProfile(Profile *profile)
 {
 	this->profiles_.removeAll(profile);
+}
+
+void Config::setTrayNotificationShown(bool value)
+{
+	this->tray_notification_shown_ = value;
+	this->settings_->setValue("traynotificationshown", value);
+}
+
+bool Config::trayNotificationShown() const
+{
+	return this->tray_notification_shown_;
 }

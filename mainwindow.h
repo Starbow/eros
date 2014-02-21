@@ -7,7 +7,12 @@
 #include <QTime>
 #include <QTimer>
 #include <QNetworkAccessManager>
+#include <QSystemTrayIcon>
+#include <QMenu>
+#include <QAction>
+#include <QCloseEvent>
 #include <qsimplefilewatcher.h>
+#include <QSound>
 
 #include "config.h"
 #include "settingswindow.h"
@@ -26,6 +31,10 @@ public:
 
 private slots:
 
+	// Tray slots
+	void trayIconClicked(QSystemTrayIcon::ActivationReason);
+	void toggleWindow();
+
 	// Config slots
 
 	void activeProfileChanged();
@@ -38,11 +47,17 @@ private slots:
 
 	void btnJoinRoom_pressed();
 	void btnQueue_pressed();
+	void btnDraw_pressed();
+	void btnNoShow_pressed();
+
+
 	void lstChats_currentItemChanged(QListWidgetItem *, QListWidgetItem *);
+	void lstChats_itemDoubleClicked(QListWidgetItem *);
 	void cmbRegion_currentIndexChanged (int index);
 
 	void connectionTimerWorker();
 	void matchmakingTimerWorker();
+	void longProcessTimerWorker();
 
 	void openBnetSettings();
 	void openSettings();
@@ -53,6 +68,7 @@ private slots:
 	void erosConnected();
 	void erosDisconnected();
 	void erosHandshakeFailed();
+	void erosBroadcastAlert(const QString message, int hint);
 
 	// Chat
 	void erosChatRoomJoined(ChatRoom *room);
@@ -74,6 +90,14 @@ private slots:
 	void erosUploadProgress(qint64 written, qint64 total);
 	void fileAction(WatchID watchId, const QString &dir, const QString &filename, Action action);
 
+	void erosLongProcessStateChanged(ErosLongProcessState);
+	void erosDrawRequested();
+	void erosDrawRequestFailed();
+	void erosNoShowRequested();
+	void erosNoShowRequestFailed();
+
+	void erosAcknowledgeLongProcessFailed();
+	void erosAcknowledgedLongProcess();
 
 	// Update checker
 	void updateCheckerFinished(QNetworkReply*);
@@ -105,13 +129,22 @@ signals:
 	void uploadReplay(const QString path);
 	void uploadReplay(QIODevice *device);
 
+	// Opponent AFK stuff.
+	void requestDraw();
+	void requestNoShow();
+	
+	void acknowledgeLongProcess(bool response);
+
 private:
 	Ui::MainWindow ui;
 
 	QTimer *connection_timer_;
 	QTimer *matchmaking_timer_;
 	QTimer *update_timer_;
+	QTimer *long_process_timer_;
 	QTime *matchmaking_start_;
+	QTime *matchmaking_result_time_;
+	QTime *long_process_start_time_;
 	QString configPath_;
 	Eros *eros_;
 	Config *config_;
@@ -123,12 +156,20 @@ private:
 	QString server_;
 	QSimpleFileWatcher *watcher_;
 	QList<WatchID> watches_;
+	QSystemTrayIcon *tray_icon_;
+	QMenu *tray_icon_menu_;
+    QAction *tray_icon_action_show_;
+    QAction *tray_icon_action_close_;
+	QSound *notification_sound_;
+
 	int local_version_;
 
 	void clearWatches();
 	void setupWatches();
 	void addWatch(const QString &);
 
+	void closeEvent(QCloseEvent *);
+	void changeEvent(QEvent *);
 	
 };
 
