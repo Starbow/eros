@@ -206,5 +206,6 @@
     <Image Include="res\eros.ico">
       <Filter>Header Files</Filter>
     </Image>
+    <Image Include="res\bow.ico" />
   </ItemGroup>
 </Project>
