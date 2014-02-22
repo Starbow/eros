@@ -25,6 +25,8 @@ Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 		this->replay_folder_ = "";
 #ifdef WIN32
 		this->replay_folder_ = QStandardPaths::locate(QStandardPaths::DocumentsLocation, "StarCraft II", QStandardPaths::LocateDirectory);
+#elif defined(Q_OS_MAC)
+        this->replay_folder_ = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "", QStandardPaths::LocateDirectory) + "Blizzard/StarCraft II";
 #endif
 	}
 }
