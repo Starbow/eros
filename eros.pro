@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,18 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp\
         bnetsettingswindow.cpp\
         chatwidget.cpp\
-        crashhandler.cpp\
         config.cpp\
         matchmakingplayerinfo.cpp\
         matchmakingsearchprogresswidget.cpp\
         profile.cpp\
         settingswindow.cpp
 
-HEADERS  += main.h\
-        mainwindow.h\
+HEADERS  += mainwindow.h\
         bnetsettingswindow.h\
         chatwidget.h\
-        crashhandler.h\
         config.h\
         matchmakingplayerinfo.h\
         matchmakingsearchprogresswidget.h\
@@ -54,12 +51,20 @@ OTHER_FILES +=
 macx {
     LIBS += -L/usr/local/lib/
     INCLUDEPATH += /usr/local/include/
+    ICON = res/eros.icns
+    QMAKE_INFO_PLIST = res/data/info.plist
 }
 linux {
     INCLUDEPATH += /opt/google-breakpad/src/
     QMAKE_CXXFLAGS += -std=gnu++0x
 }
-LIBS += -lbreakpad_client -lQSimpleFileWatcher -leros -lprotobuf
+!macx {
+    LIBS += -lbreakpad_client
+    SOURCES += crashhandler.cpp
+    HEADERS += crashhandler.h
+}
 
 
+LIBS += -lQSimpleFileWatcher -leros -lprotobuf
+CONFIG += c++11
 

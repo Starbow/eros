@@ -23,6 +23,11 @@
 	border: none;
 }
 
+/* There is an annoying black line without this */
+#frmMatchmaking {
+	margin-left: -1px;
+}
+
 #tabMatchmaking {
 	background-color: #fff;
 }
@@ -84,13 +89,18 @@ QComboBox:editable  {
     background: #560d0d;
 }
 
- QGroupBox {
+QComboBox::down-arrow {
+	image: url(:/img/client/icons/down);
+	background-color: #fff;
+}
+
+QGroupBox {
     border: 3px solid #560d0d;
 	background-color: #fff;
 	padding-top: 10px;
     font-size: 14px;
     font-family: &quot;Gobold Bold&quot;;
- }
+}
 
  QGroupBox::title {
     subcontrol-origin: margin;
@@ -119,9 +129,6 @@ QComboBox:editable  {
      background-color: #410909
  }
 
- QPushButton:flat {
-     border: none; /* no border for a flat push button */
- }
 
  QPushButton:default {
      border-color: red; /* make the default button prominent */
@@ -383,13 +390,16 @@ QLineEdit:focus
                       </item>
                      </widget>
                     </item>
-                    <item alignment="Qt::AlignRight">
+                    <item>
                      <widget class="QPushButton" name="btnQueue">
                       <property name="text">
                        <string>Queue</string>
                       </property>
                       <property name="default">
                        <bool>false</bool>
+                      </property>
+                      <property name="flat">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -717,12 +727,18 @@ color: #560d0d;</string>
                       <property name="text">
                        <string>Report No-show</string>
                       </property>
+                      <property name="flat">
+                       <bool>false</bool>
+                      </property>
                      </widget>
                     </item>
                     <item>
                      <widget class="QPushButton" name="btnDraw">
                       <property name="text">
                        <string>Offer Draw</string>
+                      </property>
+                      <property name="flat">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>

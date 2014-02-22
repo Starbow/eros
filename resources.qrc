@@ -1,63 +1,67 @@
 <RCC>
-  <qresource prefix="/img/portraits">
-    <file alias="portrait_0">res/img/portraits/0.png</file>
-    <file alias="portrait_1">res/img/portraits/1.png</file>
-    <file alias="portrait_2">res/img/portraits/2.png</file>
-  </qresource>
-  <qresource prefix="/sound">
-    <file alias="notification">res/sound/notification.wav</file>
-  </qresource>
-  <qresource prefix="/data">
-    <file alias="version_info">res/data/version.txt</file>
-  </qresource>
-  <qresource prefix="/font">
-    <file alias="Gobold-bold">res/font/Gobold Bold.ttf</file>
-    <file alias="Gobold">res/font/Gobold.ttf</file>
-    <file alias="NotoSans-Bold">res/font/NotoSans-Bold.ttf</file>
-    <file alias="NoyoSans-BoldItalic">res/font/NotoSans-BoldItalic.ttf</file>
-    <file alias="NotoSans-Italic">res/font/NotoSans-Italic.ttf</file>
-    <file alias="NotoSans-Regular">res/font/NotoSans-Regular.ttf</file>
-  </qresource>
-  <qresource prefix="/img/client/rank_icons">
-    <file alias="league_1_adv">res/img/client/large_icons/league_1_adv.png</file>
-    <file alias="league_2_adv">res/img/client/large_icons/league_2_adv.png</file>
-    <file alias="league_3_adv">res/img/client/large_icons/league_3_adv.png</file>
-    <file alias="league_4_adv">res/img/client/large_icons/league_4_adv.png</file>
-    <file alias="league_5_adv">res/img/client/large_icons/league_5_adv.png</file>
-    <file alias="league_1">res/img/client/large_icons/league_1.png</file>
-    <file alias="league_2">res/img/client/large_icons/league_2.png</file>
-    <file alias="league_3">res/img/client/large_icons/league_3.png</file>
-    <file alias="league_4">res/img/client/large_icons/league_4.png</file>
-    <file alias="league_5">res/img/client/large_icons/league_5.png</file>
-  </qresource>
-  <qresource prefix="/img/client">
-    <file alias="logo">res/img/client/logo.png</file>
-    <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
-    <file alias="search">res/img/client/search.png</file>
-  </qresource>
-  <qresource prefix="/img/client/icons">
-    <file alias="league_1_adv">res/img/client/icons/league_1_adv.png</file>
-    <file alias="league_2_adv">res/img/client/icons/league_2_adv.png</file>
-    <file alias="league_3_adv">res/img/client/icons/league_3_adv.png</file>
-    <file alias="league_4_adv">res/img/client/icons/league_4_adv.png</file>
-    <file alias="league_5_adv">res/img/client/icons/league_5_adv.png</file>
-    <file alias="match_chat">res/img/client/icons/selected matchchat.png</file>
-    <file alias="padlock">res/img/client/icons/padlock.png</file>
-    <file alias="private_chat">res/img/client/icons/privatechat.png</file>
-    <file alias="public_chat">res/img/client/icons/publicchat.png</file>
-    <file alias="cog">res/img/client/icons/cog.png</file>
-    <file alias="bow">res/img/client/icons/bow.png</file>
-    <file alias="league_1">res/img/client/icons/league_1.png</file>
-    <file alias="league_2">res/img/client/icons/league_2.png</file>
-    <file alias="league_3">res/img/client/icons/league_3.png</file>
-    <file alias="league_4">res/img/client/icons/league_4.png</file>
-    <file alias="league_5">res/img/client/icons/league_5.png</file>
-  </qresource>
-  <qresource prefix="/img/client/icons/flags">
-    <file alias="CN">res/img/client/icons/flags/cn.png</file>
-    <file alias="EU">res/img/client/icons/flags/eu.png</file>
-    <file alias="KR">res/img/client/icons/flags/kr.png</file>
-    <file alias="SEA">res/img/client/icons/flags/sg.png</file>
-    <file alias="NA">res/img/client/icons/flags/us.png</file>
-  </qresource>
+    <qresource prefix="/img/portraits">
+        <file alias="portrait_0">res/img/portraits/0.png</file>
+        <file alias="portrait_1">res/img/portraits/1.png</file>
+        <file alias="portrait_2">res/img/portraits/2.png</file>
+    </qresource>
+    <qresource prefix="/sound">
+        <file alias="notification">res/sound/notification.wav</file>
+    </qresource>
+    <qresource prefix="/data">
+        <file alias="version_info">res/data/version.txt</file>
+    </qresource>
+    <qresource prefix="/font">
+        <file alias="Gobold-bold">res/font/Gobold Bold.ttf</file>
+        <file alias="Gobold">res/font/Gobold.ttf</file>
+        <file alias="NotoSans-Bold">res/font/NotoSans-Bold.ttf</file>
+        <file alias="NoyoSans-BoldItalic">res/font/NotoSans-BoldItalic.ttf</file>
+        <file alias="NotoSans-Italic">res/font/NotoSans-Italic.ttf</file>
+        <file alias="NotoSans-Regular">res/font/NotoSans-Regular.ttf</file>
+    </qresource>
+    <qresource prefix="/img/client/rank_icons">
+        <file alias="league_1_adv">res/img/client/large_icons/league_1_adv.png</file>
+        <file alias="league_2_adv">res/img/client/large_icons/league_2_adv.png</file>
+        <file alias="league_3_adv">res/img/client/large_icons/league_3_adv.png</file>
+        <file alias="league_4_adv">res/img/client/large_icons/league_4_adv.png</file>
+        <file alias="league_5_adv">res/img/client/large_icons/league_5_adv.png</file>
+        <file alias="league_1">res/img/client/large_icons/league_1.png</file>
+        <file alias="league_2">res/img/client/large_icons/league_2.png</file>
+        <file alias="league_3">res/img/client/large_icons/league_3.png</file>
+        <file alias="league_4">res/img/client/large_icons/league_4.png</file>
+        <file alias="league_5">res/img/client/large_icons/league_5.png</file>
+    </qresource>
+    <qresource prefix="/img/client">
+        <file alias="logo">res/img/client/logo.png</file>
+        <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
+        <file alias="search">res/img/client/search.png</file>
+    </qresource>
+    <qresource prefix="/img/client/icons">
+        <file alias="league_1_adv">res/img/client/icons/league_1_adv.png</file>
+        <file alias="league_2_adv">res/img/client/icons/league_2_adv.png</file>
+        <file alias="league_3_adv">res/img/client/icons/league_3_adv.png</file>
+        <file alias="league_4_adv">res/img/client/icons/league_4_adv.png</file>
+        <file alias="league_5_adv">res/img/client/icons/league_5_adv.png</file>
+        <file alias="match_chat">res/img/client/icons/selected matchchat.png</file>
+        <file alias="padlock">res/img/client/icons/padlock.png</file>
+        <file alias="private_chat">res/img/client/icons/privatechat.png</file>
+        <file alias="public_chat">res/img/client/icons/publicchat.png</file>
+        <file alias="cog">res/img/client/icons/cog.png</file>
+        <file alias="bow">res/img/client/icons/bow.png</file>
+        <file alias="league_1">res/img/client/icons/league_1.png</file>
+        <file alias="league_2">res/img/client/icons/league_2.png</file>
+        <file alias="league_3">res/img/client/icons/league_3.png</file>
+        <file alias="league_4">res/img/client/icons/league_4.png</file>
+        <file alias="league_5">res/img/client/icons/league_5.png</file>
+        <file alias="down">res/img/client/icons/down.png</file>
+        <file alias="up">res/img/client/icons/up.png</file>
+        <file alias="down_white">res/img/client/icons/down_white.png</file>
+        <file alias="up_white">res/img/client/icons/up_white.png</file>
+    </qresource>
+    <qresource prefix="/img/client/icons/flags">
+        <file alias="CN">res/img/client/icons/flags/cn.png</file>
+        <file alias="EU">res/img/client/icons/flags/eu.png</file>
+        <file alias="KR">res/img/client/icons/flags/kr.png</file>
+        <file alias="SEA">res/img/client/icons/flags/sg.png</file>
+        <file alias="NA">res/img/client/icons/flags/us.png</file>
+    </qresource>
 </RCC>

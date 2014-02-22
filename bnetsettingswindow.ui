@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
+    <width>708</width>
     <height>443</height>
    </rect>
   </property>
@@ -39,6 +39,9 @@
        <widget class="QPushButton" name="btnNewManualProfile">
         <property name="text">
          <string>Add Battle.net Profile</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -95,16 +98,16 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
             <property name="leftMargin">
-             <number>9</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>9</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
-             <number>9</number>
+             <number>0</number>
             </property>
             <item row="0" column="0" alignment="Qt::AlignTop">
              <widget class="QLabel" name="lblVerified">
@@ -281,9 +284,15 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QFormLayout" name="formLayout">
+        <layout class="QGridLayout" name="gridLayout_5">
          <item row="0" column="0">
           <widget class="QLabel" name="label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Region:</string>
            </property>
@@ -363,12 +372,18 @@
            <property name="text">
             <string>Delete Profile</string>
            </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item alignment="Qt::AlignRight">
           <widget class="QPushButton" name="btnUpdate">
            <property name="text">
             <string>Update</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

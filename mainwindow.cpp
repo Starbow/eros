@@ -145,10 +145,23 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	bnetsettings_window_ = nullptr;
 
 	// Remove the close box from the first 2 tabs.
-#ifdef WIN32
-    ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
-    ui.tabContainer->tabBar()->tabButton(1, QTabBar::RightSide)->resize(0, 0);
-#endif
+    // On mac it's LeftSide. Assuming RightSide causes a nullptr.
+    QWidget *tab = ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide);
+    if (tab != nullptr)
+        tab->resize(0, 0);
+
+    tab = ui.tabContainer->tabBar()->tabButton(1, QTabBar::RightSide);
+    if (tab != nullptr)
+        tab->resize(0, 0);
+
+    tab = ui.tabContainer->tabBar()->tabButton(0, QTabBar::LeftSide);
+    if (tab != nullptr)
+        tab->resize(0, 0);
+
+    tab = ui.tabContainer->tabBar()->tabButton(1, QTabBar::LeftSide);
+    if (tab != nullptr)
+        tab->resize(0, 0);
+
 	ui.tabContainer->tabBar()->setUsesScrollButtons(true);
 	
 	QObject::connect(ui.tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(tabContainer_tabCloseRequested(int)));
