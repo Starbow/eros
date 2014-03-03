@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/img/client/icons/bow</normaloff>:/img/client/icons/bow</iconset>
+    <normaloff>:/img/client/icons/icon_1024x1024</normaloff>:/img/client/icons/icon_1024x1024</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">.QFrame

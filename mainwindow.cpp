@@ -11,8 +11,6 @@
 #include "matchmakingplayerinfo.h"
 #include "matchmakingsearchprogresswidget.h"
 
-#define EROS_CURRENT_VERSION = 1
-
 MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	: QMainWindow(parent)
 {
@@ -33,13 +31,13 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	else
 	{
 		QByteArray data = version.readAll();
-		QStringList tokens = QString::fromLocal8Bit(data).split('|');
+		QStringList tokens = QString::fromUtf8(data).split('|');
 		this->local_version_ = tokens[0].toInt();
 		version.close();
 	}
-
+	
 	ui.setupUi(this);
-	this->setWindowTitle(tr("Alpha version %1").arg(this->local_version_));
+	this->setWindowTitle(tr("Alpha Version %1").arg(this->local_version_));
 	delete ui.lblLocalPlaceholder;
 	delete ui.lblRemotePlaceholder;
 
@@ -69,7 +67,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this->tray_icon_, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayIconClicked(QSystemTrayIcon::ActivationReason)));
 
 
-	this->tray_icon_->setIcon(QIcon(":/img/client/icons/bow"));
+	this->tray_icon_->setIcon(QIcon(":/img/client/icons/icon_32x32"));
 	this->tray_icon_menu_->addAction(tray_icon_action_show_);
 	this->tray_icon_menu_->addAction(tray_icon_action_close_);
 	this->tray_icon_->setContextMenu(this->tray_icon_menu_);
@@ -175,7 +173,10 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(ui.btnNoShow, SIGNAL(clicked()), this, SLOT(btnNoShow_pressed()));
 	
 
+#if !defined(Q_OS_MAC)
 	this->tray_icon_->show();
+#endif
+
 		// The user should be prevented from emptying invalid values in the settings dialog.
 	if (this->config_->profiles().count() == 0)
 	{
@@ -330,26 +331,17 @@ void MainWindow::erosAcknowledgedLongProcess()
 
 }
 
-void MainWindow::changeEvent(QEvent *event)
-{
-    QMainWindow::changeEvent(event);
-    if(event->type() == QEvent::WindowStateChange) {
-        if(isMinimized())
-            this->hide();
-    }
-}
- 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+	#if !defined(Q_OS_MAC)
 	if (this->tray_icon_->isVisible()) {
 		toggleWindow();
 		event->ignore();
-		if (!this->config_->trayNotificationShown())
-		{
-			this->config_->setTrayNotificationShown(true);
-			this->tray_icon_->showMessage("Eros", tr("Eros is still running in the notification tray. Right click the icon if you want to exit."));
-		}
+
+		this->config_->setTrayNotificationShown(true);
+		this->tray_icon_->showMessage("Eros", tr("Eros is still running in the notification tray. Right click the icon if you want to exit."));
 	}
+	#endif
 }
 
 void MainWindow::toggleWindow()
@@ -410,7 +402,7 @@ void MainWindow::updateCheckerFinished(QNetworkReply* reply)
 	if (reply->error() == QNetworkReply::NoError)
 	{
 		QByteArray data = reply->readAll();
-		QStringList tokens = QString::fromLocal8Bit(data).split('|');
+		QStringList tokens = QString::fromUtf8(data).split('|');
 		if (tokens.count() == 3)
 		{
 			int version = tokens[0].toInt();
@@ -975,7 +967,6 @@ void MainWindow::clearWatches()
 void MainWindow::setupWatches()
 {
 	clearWatches();
-
 	try {
 		if (this->config_->activeProfile() != nullptr)
 		{

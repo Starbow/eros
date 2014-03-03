@@ -11,13 +11,13 @@
 #include <QMenu>
 #include <QAction>
 #include <QCloseEvent>
-#include <qsimplefilewatcher.h>
 #include <QSound>
 
 #include "config.h"
 #include "settingswindow.h"
 #include "bnetsettingswindow.h"
 #include "ui_mainwindow.h"
+#include "../QSimpleFileWatcher/qsimplefilewatcher.h"
 #include "../liberos/eros.h"
 
 
@@ -169,8 +169,6 @@ private:
 	void addWatch(const QString &);
 
 	void closeEvent(QCloseEvent *);
-	void changeEvent(QEvent *);
-	
 };
 
 #endif // EROS_H
