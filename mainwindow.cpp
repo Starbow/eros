@@ -10,6 +10,8 @@
 #include "chatwidget.h"
 #include "matchmakingplayerinfo.h"
 #include "matchmakingsearchprogresswidget.h"
+#include "erostitlebar.h"
+
 
 MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	: QMainWindow(parent)
@@ -37,6 +39,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	}
 	
 	ui.setupUi(this);
+	ui.centralWidget->setMouseTracking(true);
+	title_bar_ = ErosTitleBar::addToLayout(this, ui.verticalLayout);
 	this->setWindowTitle(tr("Alpha Version %1").arg(this->local_version_));
 	delete ui.lblLocalPlaceholder;
 	delete ui.lblRemotePlaceholder;
@@ -71,7 +75,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->tray_icon_menu_->addAction(tray_icon_action_show_);
 	this->tray_icon_menu_->addAction(tray_icon_action_close_);
 	this->tray_icon_->setContextMenu(this->tray_icon_menu_);
-
+	title_bar_->setMenu(this->tray_icon_menu_);
 
 
 	// File watcher
@@ -202,6 +206,20 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 MainWindow::~MainWindow()
 {
 
+}
+
+
+void MainWindow::mouseMoveEvent(QMouseEvent *e)
+{
+	this->title_bar_->mouseMoveEvent(e);
+}
+void MainWindow::mousePressEvent(QMouseEvent *e)
+{
+	this->title_bar_->mousePressEvent(e);
+}
+void MainWindow::mouseReleaseEvent(QMouseEvent *e)
+{
+	this->title_bar_->mouseReleaseEvent(e);
 }
 
 void MainWindow::longProcessTimerWorker()

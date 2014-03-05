@@ -17,6 +17,7 @@
 #include "settingswindow.h"
 #include "bnetsettingswindow.h"
 #include "ui_mainwindow.h"
+#include "erostitlebar.h"
 #include "../QSimpleFileWatcher/qsimplefilewatcher.h"
 #include "../liberos/eros.h"
 
@@ -161,6 +162,7 @@ private:
     QAction *tray_icon_action_show_;
     QAction *tray_icon_action_close_;
 	QSound *notification_sound_;
+	ErosTitleBar *title_bar_;
 
 	int local_version_;
 
@@ -169,6 +171,10 @@ private:
 	void addWatch(const QString &);
 
 	void closeEvent(QCloseEvent *);
+
+	void mouseMoveEvent(QMouseEvent *e);
+	void mousePressEvent(QMouseEvent *e);
+	void mouseReleaseEvent(QMouseEvent *e);
 };
 
 #endif // EROS_H

@@ -150,12 +150,22 @@ QLineEdit
 QLineEdit:focus
 {
      background-color:#e3e4e6;
-}</string>
+}
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>8</number>
+    </property>
+    <property name="topMargin">
+     <number>8</number>
+    </property>
+    <property name="rightMargin">
+     <number>8</number>
+    </property>
     <property name="bottomMargin">
-     <number>0</number>
+     <number>8</number>
     </property>
     <item alignment="Qt::AlignHCenter">
      <widget class="QFrame" name="frmLogo">

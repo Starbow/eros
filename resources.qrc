@@ -35,6 +35,12 @@
     <file alias="logo_scaled">res/img/client/logo_scaled.png</file>
     <file alias="search">res/img/client/search.png</file>
   </qresource>
+  <qresource prefix="/img/client/ui">
+    <file alias="restore">res/img/client/ui/restore.png</file>
+    <file alias="close">res/img/client/ui/close.png</file>
+    <file alias="max">res/img/client/ui/max.png</file>
+    <file alias="min">res/img/client/ui/min.png</file>
+  </qresource>
   <qresource prefix="/img/client/icons">
     <file alias="icon_1024x1024">res/img/client/icons/eros.iconset/icon_512x512@2x.png</file>
     <file alias="icon_32x32">res/img/client/icons/eros.iconset/icon_32x32.png</file>
