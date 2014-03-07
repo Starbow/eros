@@ -48,11 +48,11 @@ QPushButton::hover
 }
 
 #btnClose {
-	background-color: #ffffff;
+	background-color: palette(window);
 }
 
 #btnClose::hover {
-	background-color: #dddddd;
+	background-color: #ffffff;
 }
 </string>
   </property>

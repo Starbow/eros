@@ -4,6 +4,10 @@
     <file alias="portrait_1">res/img/portraits/1.png</file>
     <file alias="portrait_2">res/img/portraits/2.png</file>
   </qresource>
+  <qresource prefix="/img/maps">
+    <file alias="loading">res/img/maps/loading.png</file>
+    <file alias="nopreview">res/img/maps/nopreview.png</file>
+  </qresource>
   <qresource prefix="/sound">
     <file alias="notification">res/sound/notification.wav</file>
   </qresource>
@@ -42,6 +46,8 @@
     <file alias="min">res/img/client/ui/min.png</file>
   </qresource>
   <qresource prefix="/img/client/icons">
+    <file alias="cross">res/img/client/icons/cross.png</file>
+    <file alias="clipboard">res/img/client/icons/clipboard.png</file>
     <file alias="icon_1024x1024">res/img/client/icons/eros.iconset/icon_512x512@2x.png</file>
     <file alias="icon_32x32">res/img/client/icons/eros.iconset/icon_32x32.png</file>
     <file alias="league_1_adv">res/img/client/icons/league_1_adv.png</file>
