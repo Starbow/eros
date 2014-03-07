@@ -43,6 +43,7 @@ ChatWidget::ChatWidget(Eros *eros, ChatRoom *chatroom, QWidget *parent)
 	{
 		this->ui.listUsers->addItem(users[i]->username());
 	}
+	this->ui.listUsers->sortItems();
 }
 
 ChatWidget::~ChatWidget()
@@ -72,28 +73,35 @@ void ChatWidget::setUser(User *user)
 
 void ChatWidget::addUser(User *user)
 {
-	writeLog(QString(tr("%1 has joined the chat.")).arg(user->username()));
+	if (!this->chatroom_->forced())
+		writeLog(QString(tr("%1 has joined the chat.")).arg(user->username()));
 	this->ui.listUsers->addItem(user->username());
 	this->ui.listUsers->sortItems();
 }
 
 void ChatWidget::removeUser(User *user)
 {
-	writeLog(QString(tr("%1 has left the chat.")).arg(user->username()));
+	if (!this->chatroom_->forced())
+		writeLog(QString(tr("%1 has left the chat.")).arg(user->username()));
 	qDeleteAll(this->ui.listUsers->findItems(user->username(), Qt::MatchFlag::MatchExactly));
 }
 
 void ChatWidget::writeLog(const QString &data, bool sanitize)
 {		
+	QTextCharFormat format;
+	ui.txtMessages->setCurrentCharFormat(format);
     if (sanitize)
     {
         QString sanitized(data);
+		sanitized = sanitized.replace("&", "&amp;", Qt::CaseSensitivity::CaseInsensitive);
         sanitized = sanitized.replace("<", "&lt;", Qt::CaseSensitivity::CaseInsensitive);
-        ui.txtMessages->append(QString("[%1] %2").arg(QTime::currentTime().toString("HH:mm:ss"), sanitized));
+		sanitized = sanitized.replace(">", "&gt;", Qt::CaseSensitivity::CaseInsensitive);
+		
+		ui.txtMessages->append(QString("<span style=\"color: #cccccc\">[%1]</span> %2").arg(QTime::currentTime().toString("HH:mm:ss"), sanitized));
     }
     else
     {
-        ui.txtMessages->append(QString("[%1] %2").arg(QTime::currentTime().toString("HH:mm:ss"), data));
+        ui.txtMessages->append(QString("<span style=\"color: #cccccc\">[%1]</span> %2").arg(QTime::currentTime().toString("HH:mm:ss"), data));
     }
     ui.txtMessages->verticalScrollBar()->setValue(ui.txtMessages->verticalScrollBar()->maximum());
 }
