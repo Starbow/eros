@@ -23,6 +23,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QFontDatabase::addApplicationFont(":/font/NotoSans-BoldItalic");
 	QFontDatabase::addApplicationFont(":/font/Gobold");
 	QFontDatabase::addApplicationFont(":/font/Gobold-bold");
+	QFontDatabase::addApplicationFont(":/font/Gobold-thin");
 
 
 	QFile version(":/data/version_info");
@@ -725,6 +726,7 @@ void MainWindow::erosConnected()
 		emit joinChatRoom(room);
 	}
 	setUiEnabled(true);
+	emit refreshChatRooms();
 }
 
 void MainWindow::erosDisconnected()
@@ -1005,8 +1007,8 @@ void MainWindow::openBnetSettings()
 	if(bnetsettings_window_ == nullptr)
 	{
 		bnetsettings_window_ = new BnetSettingsWindow(this, this->eros_);
-		ui.tabContainer->insertTab(2, bnetsettings_window_, "Battle.net Accounts");
-		ui.tabContainer->setCurrentIndex(2);		
+		ui.tabContainer->insertTab(3, bnetsettings_window_, "Battle.net Accounts");
+		ui.tabContainer->setCurrentIndex(3);		
 	}
 	else
 	{
@@ -1026,8 +1028,8 @@ void MainWindow::openSettings()
 	{
 		this->settings_window_ = new SettingsWindow(this, this->config_);
 		QObject::connect(this->settings_window_, SIGNAL(profileChanged()), this, SLOT(activeProfileChanged()));
-		ui.tabContainer->insertTab(2, this->settings_window_, "Settings");
-		ui.tabContainer->setCurrentIndex(2);
+		ui.tabContainer->insertTab(3, this->settings_window_, "Settings");
+		ui.tabContainer->setCurrentIndex(3);
 	} 
 	else
 	{

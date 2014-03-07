@@ -114,7 +114,7 @@ QGroupBox {
  QPushButton {
     background-color:#560d0d;
     color:#e3e4e6;
-	font-family: &quot;Gobold Bold&quot;;
+	font-family: &quot;Gobold Thin&quot;;
 	font-size: 12px;
 	border: 1px solid #3b0505;
 	padding: 2px;
@@ -127,7 +127,8 @@ QGroupBox {
 
 
  QPushButton:default {
-     border-color: red; /* make the default button prominent */
+     border-color: red; 
+	font-family: &quot;Gobold Bold&quot;;
  }
 
 QPushButton:!enabled
@@ -236,7 +237,7 @@ QLineEdit:focus
        <bool>true</bool>
       </property>
       <property name="movable">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="tabMatchmaking">
        <attribute name="title">
@@ -996,7 +997,7 @@ color: #560d0d;</string>
            <item alignment="Qt::AlignRight">
             <widget class="QPushButton" name="btnRefreshChats">
              <property name="text">
-              <string>Refresh Chat Rooms</string>
+              <string>Refresh</string>
              </property>
             </widget>
            </item>
@@ -1098,7 +1099,7 @@ color: #560d0d;</string>
            <item row="2" column="0" alignment="Qt::AlignRight">
             <widget class="QPushButton" name="btnJoinRoom">
              <property name="text">
-              <string>Join Room</string>
+              <string>Join</string>
              </property>
             </widget>
            </item>

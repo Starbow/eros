@@ -15,6 +15,7 @@
     <file alias="version_info">res/data/version.txt</file>
   </qresource>
   <qresource prefix="/font">
+    <file alias="Gobold-thin">res/font/Gobold Thin.ttf</file>
     <file alias="Gobold-bold">res/font/Gobold Bold.ttf</file>
     <file alias="Gobold">res/font/Gobold.ttf</file>
     <file alias="NotoSans-Bold">res/font/NotoSans-Bold.ttf</file>
