@@ -56,6 +56,7 @@ private slots:
 	void lstChats_itemDoubleClicked(QListWidgetItem *);
 	void cmbRegion_currentIndexChanged (int index);
 
+
 	void connectionTimerWorker();
 	void matchmakingTimerWorker();
 	void longProcessTimerWorker();
@@ -68,7 +69,8 @@ private slots:
 	void erosConnectionError(QAbstractSocket::SocketError, const QString error_string);
 	void erosConnected();
 	void erosDisconnected();
-	void erosHandshakeFailed();
+	void erosAuthenticationFailed();
+	void erosAlreadyLoggedIn();
 	void erosBroadcastAlert(const QString message, int hint);
 
 	// Chat
@@ -100,9 +102,18 @@ private slots:
 	void erosAcknowledgeLongProcessFailed();
 	void erosAcknowledgedLongProcess();
 
+	void erosToggleVetoFailed(Map* map, ErosError error);
+	void erosVetoesUpdated();
+
 	// Update checker
 	void updateCheckerFinished(QNetworkReply*);
 	void updateCheckerTimerWorker();
+
+	// Vetoes
+	void cmbMapRegion_currentIndexChanged(int index);
+	void lstMaps_currentItemChanged(QListWidgetItem *, QListWidgetItem *);
+	void previewDownloadFinished(QNetworkReply*);
+	void btnToggleVeto_clicked();
 signals:
 	// Connectivity slots
 	void connectToEros(const QString server, const QString username, const QString password);
@@ -136,6 +147,8 @@ signals:
 	
 	void acknowledgeLongProcess(bool response);
 
+	void toggleVeto(Map *map);
+
 private:
 	Ui::MainWindow ui;
 
@@ -163,6 +176,9 @@ private:
     QAction *tray_icon_action_close_;
 	QSound *notification_sound_;
 	ErosTitleBar *title_bar_;
+	QNetworkAccessManager *preview_loader_nam_;
+	QMap<QString, QPixmap*> preview_cache_;
+	Map *selected_map_;
 
 	int local_version_;
 

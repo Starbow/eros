@@ -39,8 +39,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	}
 	
 	ui.setupUi(this);
-	ui.centralWidget->setMouseTracking(true);
 	title_bar_ = ErosTitleBar::addToLayout(this, ui.verticalLayout);
+	ui.centralWidget->setMouseTracking(true);
 	this->setWindowTitle(tr("Alpha Version %1").arg(this->local_version_));
 	delete ui.lblLocalPlaceholder;
 	delete ui.lblRemotePlaceholder;
@@ -61,7 +61,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->long_process_timer_ = new QTimer(this);
 	this->tray_icon_ = new QSystemTrayIcon(this);
 	this->tray_icon_menu_ = new QMenu(this);
-	
+	this->preview_loader_nam_ = new QNetworkAccessManager(this);
+	this->preview_cache_ = QMap<QString, QPixmap*>();
+
 	tray_icon_action_show_ = new QAction("Hide Eros", this);
 	tray_icon_action_close_ = new QAction("Close Eros", this);
 
@@ -85,13 +87,17 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(update_checker_nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(updateCheckerFinished(QNetworkReply*)));
 	QObject::connect(this->update_timer_, SIGNAL(timeout()), this, SLOT(updateCheckerTimerWorker()));
 
+	//Preview loader
+	QObject::connect(preview_loader_nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(previewDownloadFinished(QNetworkReply*)));
+
 	// Set up Eros signals
 	/// Eros Signals
 	QObject::connect(eros_, SIGNAL(stateChanged(ErosState)), this, SLOT(erosStateChanged(ErosState)));
 	QObject::connect(eros_, SIGNAL(connectionError(QAbstractSocket::SocketError, const QString)), this, SLOT(erosConnectionError(QAbstractSocket::SocketError, const QString)));
 	QObject::connect(eros_, SIGNAL(connected()), this, SLOT(erosConnected()));
 	QObject::connect(eros_, SIGNAL(disconnected()), this, SLOT(erosDisconnected()));
-	QObject::connect(eros_, SIGNAL(handshakeFailed()), this, SLOT(erosHandshakeFailed()));
+	QObject::connect(eros_, SIGNAL(authenticationFailed()), this, SLOT(erosAuthenticationFailed()));
+	QObject::connect(eros_, SIGNAL(alreadyLoggedIn()), this, SLOT(erosAlreadyLoggedIn()));
 	QObject::connect(eros_, SIGNAL(broadcastAlert(const QString, int)), this, SLOT(erosBroadcastAlert(const QString, int)));
 	QObject::connect(eros_, SIGNAL(chatRoomAdded(ChatRoom*)), this, SLOT(erosChatRoomAdded(ChatRoom*)));
 	QObject::connect(eros_, SIGNAL(chatRoomRemoved(ChatRoom*)), this, SLOT(erosChatRoomRemoved(ChatRoom*)));
@@ -114,6 +120,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(acknowledgeLongProcessFailed()), this, SLOT(erosAcknowledgeLongProcessFailed()));
 	QObject::connect(eros_, SIGNAL(acknowledgedLongProcess()), this, SLOT(erosAcknowledgedLongProcess()));
 
+	QObject::connect(eros_, SIGNAL(vetoesUpdated()), this, SLOT(erosVetoesUpdated()));
+	QObject::connect(eros_, SIGNAL(toggleVetoFailed(Map*,ErosError)), this, SLOT(erosToggleVetoFailed(Map*,ErosError)));
+
 
 	/// Eros Slots
 	QObject::connect(this, SIGNAL(connectToEros(const QString, const QString, const QString)), eros_, SLOT(connectToEros(const QString, const QString, const QString)));
@@ -133,6 +142,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this, SIGNAL(requestNoShow()), eros_, SLOT(requestNoShow()));
 	QObject::connect(this, SIGNAL(acknowledgeLongProcess(bool)), eros_, SLOT(acknowledgeLongProcess(bool)));
 
+	QObject::connect(this, SIGNAL(toggleVeto(Map*)), eros_, SLOT(toggleVeto(Map*)));
+
 
 
 	// timers
@@ -148,22 +159,18 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 
 	// Remove the close box from the first 2 tabs.
     // On mac it's LeftSide. Assuming RightSide causes a nullptr.
-    QWidget *tab = ui.tabContainer->tabBar()->tabButton(0, QTabBar::RightSide);
-    if (tab != nullptr)
-        tab->resize(0, 0);
 
-    tab = ui.tabContainer->tabBar()->tabButton(1, QTabBar::RightSide);
-    if (tab != nullptr)
-        tab->resize(0, 0);
+	for (int i = 0; i < 3; i++)
+	{
+		QWidget *tab = ui.tabContainer->tabBar()->tabButton(i, QTabBar::RightSide);
+		if (tab != nullptr)
+			tab->resize(0, 0);
 
-    tab = ui.tabContainer->tabBar()->tabButton(0, QTabBar::LeftSide);
-    if (tab != nullptr)
-        tab->resize(0, 0);
-
-    tab = ui.tabContainer->tabBar()->tabButton(1, QTabBar::LeftSide);
-    if (tab != nullptr)
-        tab->resize(0, 0);
-
+		tab = ui.tabContainer->tabBar()->tabButton(i, QTabBar::LeftSide);
+		if (tab != nullptr)
+			tab->resize(0, 0);
+	}
+    
 	ui.tabContainer->tabBar()->setUsesScrollButtons(true);
 	
 	QObject::connect(ui.tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(tabContainer_tabCloseRequested(int)));
@@ -172,10 +179,12 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(ui.lstChats, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(lstChats_currentItemChanged(QListWidgetItem *, QListWidgetItem *)));
 	QObject::connect(ui.lstChats, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(lstChats_itemDoubleClicked(QListWidgetItem*)));
 	QObject::connect(ui.cmbRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbRegion_currentIndexChanged(int)));
+	QObject::connect(ui.cmbMapRegion, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbMapRegion_currentIndexChanged(int)));
 	QObject::connect(ui.btnQueue, SIGNAL(clicked()), this, SLOT(btnQueue_pressed()));
 	QObject::connect(ui.btnDraw, SIGNAL(clicked()), this, SLOT(btnDraw_pressed()));
 	QObject::connect(ui.btnNoShow, SIGNAL(clicked()), this, SLOT(btnNoShow_pressed()));
-	
+	QObject::connect(ui.lstMaps, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(lstMaps_currentItemChanged(QListWidgetItem *, QListWidgetItem *)));
+	QObject::connect(ui.btnToggleVeto, SIGNAL(clicked()), this, SLOT(btnToggleVeto_clicked()));
 
 #if !defined(Q_OS_MAC)
 	this->tray_icon_->show();
@@ -627,6 +636,49 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 	//ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(eros_->regionSearchingUserCount(region)));
 }
 
+void MainWindow::cmbMapRegion_currentIndexChanged (int index)
+{
+	ui.lstMaps->clear();
+
+	if (index < 0)
+		return;
+
+	LocalUser *user = eros_->localUser();
+	int regionIndex = ui.cmbMapRegion->currentData().toInt();
+	ErosRegion region = eros_->activeRegions()[regionIndex];
+
+	for (int i = 0; i < eros_->mapPool().size(); i++)
+	{
+		Map *map = eros_->mapPool()[i];
+		if (map->region() == region)
+		{
+			QListWidgetItem *item = new QListWidgetItem(map->name());
+			item->setData(101, (int)region);
+			item->setData(102, (int)map->battleNetId());
+
+			if (eros_->localUser()->vetoes().contains(map))
+			{
+				item->setIcon(QIcon(":/img/client/icons/cross"));
+			}
+			ui.lstMaps->addItem(item);
+		}
+	}
+	ui.lstMaps->sortItems();
+
+	if (this->selected_map_ != nullptr)
+	{
+		for (int i = 0; i < ui.lstMaps->count(); i++)
+		{
+			QListWidgetItem *item = ui.lstMaps->item(i);
+
+			if (item->data(101).toInt() == this->selected_map_->region() && item->data(102).toInt() == this->selected_map_->battleNetId())
+			{
+				ui.lstMaps->setCurrentItem(item);
+				break;
+			}
+		}
+	}
+}
 void MainWindow::erosConnectionError(QAbstractSocket::SocketError error, const QString error_string)
 {
 	ui.lblInformation->setText(tr("Connection error (%1): %2").arg(QString::number(error), error_string));
@@ -636,12 +688,26 @@ void MainWindow::erosConnected()
 {
 	setupWatches();
 	ui.cmbRegion->clear();
+	ui.cmbMapRegion->clear();
+	ui.lstMaps->clear();
 	ui.lstChats->clear();
+	this->selected_map_ = nullptr;
 	int set_index = 0;
 	int pref_region = this->config_->preferredRegion();
 	for (int i =0; i < this->eros_->activeRegions().count(); i++)
 	{
 		ui.cmbRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), Eros::regionToLongString(this->eros_->activeRegions()[i]), i);
+
+		int vetoes = 0;
+		for (int j = 0; j < eros_->localUser()->vetoes().size(); j++)
+		{
+			if (eros_->localUser()->vetoes()[j]->region() == this->eros_->activeRegions()[i])
+				vetoes++;
+		}
+		
+
+		ui.cmbMapRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr(vetoes == 1 ? "%1/%2 veto used" : "%1/%2 vetoes used").arg(vetoes).arg(eros_->maxVetoes())), i);
+
 		if (this->eros_->activeRegions()[i] == pref_region)
 			set_index = i;
 	}
@@ -650,7 +716,8 @@ void MainWindow::erosConnected()
 
 	if (ui.cmbRegion->count() > 0)
 		ui.cmbRegion->setCurrentIndex(set_index);
-
+	if (ui.cmbMapRegion->count() > 0)
+		ui.cmbMapRegion->setCurrentIndex(set_index);
 	erosLocalUserUpdated(this->eros_->localUser());
 	if (this->config_->autoJoin())
 	{
@@ -665,18 +732,25 @@ void MainWindow::erosDisconnected()
 	setUiEnabled(false);
 	setQueueState(false);
 	ui.lstChats->clear();
+	ui.lstMaps->clear();
+	this->selected_map_ = nullptr;
 }
 
-void MainWindow::erosHandshakeFailed()
+void MainWindow::erosAuthenticationFailed()
 {
 	ui.lblInformation->setText(tr("Authentication failed. Server error if you previously connected fine."));
 }
 
 
+void MainWindow::erosAlreadyLoggedIn()
+{
+	ui.lblInformation->setText(tr("Already logged in. Check that you're not running another client."));
+}
+
 void MainWindow::erosLocalUserUpdated(LocalUser *user)
 {
 	cmbRegion_currentIndexChanged(ui.cmbRegion->currentIndex());
-	
+	cmbMapRegion_currentIndexChanged(ui.cmbMapRegion->currentIndex());
 }
 // Handle updating the status label and toggling the connection timer.
 void MainWindow::erosStateChanged(ErosState state)
@@ -811,8 +885,18 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 
 void MainWindow::setUiEnabled(bool enabled)
 {
-	ui.tabMatchmaking->setEnabled(enabled);
-	ui.tabChat->setEnabled(enabled);
+	if (enabled)
+	{
+		ui.tabMatchmaking->setEnabled(true);
+		ui.tabChat->setEnabled(true);
+		ui.tabMaps->setEnabled(true);
+	}
+	else
+	{
+		ui.tabMatchmaking->setDisabled(true);
+		ui.tabChat->setDisabled(true);
+		ui.tabMaps->setDisabled(true);
+	}
 }
 
 //////// CHAT
@@ -882,7 +966,11 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 			widget->writeLog(tr("You have been automatically joined to this chat room for your match against <strong>%1</strong> on <a href=\"starcraft://map/%2/%3\">%4</a>. Don't forget to set the game speed to <strong>Faster</strong> when clicking the map link. We suggest joining the channel <strong>%5</strong> on Battle.net. GLHF!").arg(match->opponent()->username(), QString::number((int)region), QString::number(match->mapId()), match->mapName(), match->battleNetChannel()), false); 
 		}
 	}
-	ui.tabContainer->setCurrentIndex(id);
+
+	if (!room->forced())
+	{
+		ui.tabContainer->setCurrentIndex(id);
+	}
 
 }
 void MainWindow::erosChatRoomLeft(ChatRoom *room)
@@ -1053,4 +1141,102 @@ void MainWindow::activeProfileChanged()
 {
 	emit disconnectFromEros();
 	QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
+}
+
+void MainWindow::previewDownloadFinished(QNetworkReply* reply)
+{
+	if (reply->error() == QNetworkReply::NoError)
+	{
+		QByteArray data = reply->readAll();
+		QPixmap *pixmap = new QPixmap();
+		pixmap->loadFromData(data);
+
+		ui.lblMapPreview->setPixmap(*pixmap);
+		preview_cache_.insert(reply->request().url().toString(), pixmap);
+	}
+}
+
+void MainWindow::lstMaps_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+	if (current != nullptr)
+	{
+		ErosRegion region = (ErosRegion)current->data(101).toInt();
+		int id = current->data(102).toInt();
+		
+		selected_map_ = eros_->findMap(region, id);
+
+		if (selected_map_ != nullptr)
+		{
+			bool vetoed = eros_->localUser()->vetoes().contains(selected_map_);
+
+			if (vetoed)
+				ui.btnToggleVeto->setText(tr("Unveto"));
+			else
+				ui.btnToggleVeto->setText(tr("Veto"));
+		
+			QString infoLink = tr("<em>No info link</em>");
+			if (!selected_map_->infoUrl().isEmpty())
+				infoLink = tr("<a href=\"%1\">Info link</a>").arg(selected_map_->infoUrl());
+
+			ui.lblMapInfoLinks->setText(QString("<img src=\":/img/client/icons/flags/%1\"> %2<br />%3 | <a href=\"starcraft://map/%4/%5\">%6</a>").arg(Eros::regionToString(region), selected_map_->name(), infoLink, QString::number(region), QString::number(id), tr("View in game")));
+
+			if (selected_map_->description().isEmpty())
+			{
+				ui.lblMapDescription->setText(tr("<em>No Description</em>"));
+			}
+			else
+			{
+				ui.lblMapDescription->setText(selected_map_->description());
+			}
+
+			if (selected_map_->previewUrl().isEmpty())
+			{
+				ui.lblMapPreview->setPixmap(QPixmap(":/img/maps/nopreview"));
+			} 
+			else
+			{
+				ui.lblMapPreview->setPixmap(QPixmap(":/img/maps/loading"));
+				if (preview_cache_.contains(selected_map_->previewUrl()))
+				{
+					ui.lblMapPreview->setPixmap(*preview_cache_[selected_map_->previewUrl()]);
+				}
+				else
+				{
+					QNetworkReply* reply = this->preview_loader_nam_->get(QNetworkRequest(selected_map_->previewUrl()));
+				}
+			}
+		}
+	}
+
+}
+
+void MainWindow::btnToggleVeto_clicked()
+{
+	if (this->selected_map_ == nullptr)
+		return;
+	ui.btnToggleVeto->setDisabled(true);
+	emit toggleVeto(this->selected_map_);
+}
+
+void MainWindow::erosToggleVetoFailed(Map* map, ErosError error)
+{
+	QMessageBox::information(this, tr("Veto Update Failed"), tr("Failed to update veto for \"%1\". %2").arg(map->name(), Eros::errorString(error)));
+	ui.btnToggleVeto->setEnabled(true);
+}
+void MainWindow::erosVetoesUpdated()
+{
+	ui.btnToggleVeto->setEnabled(true);
+	for (int i = 0; i < ui.cmbMapRegion->count(); i++)
+	{
+		int vetoes = 0;
+		ErosRegion region = eros_->activeRegions()[ui.cmbMapRegion->itemData(i).toInt()];
+
+		for (int j = 0; j < eros_->localUser()->vetoes().size(); j++)
+		{
+			if (eros_->localUser()->vetoes()[j]->region() == region)
+				vetoes++;
+		}
+
+		ui.cmbMapRegion->setItemText(i, QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr(vetoes == 1 ? "%1/%2 veto used" : "%1/%2 vetoes used").arg(vetoes).arg(eros_->maxVetoes())));
+	}
 }
