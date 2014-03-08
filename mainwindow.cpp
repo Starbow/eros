@@ -40,7 +40,6 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	}
 	
 	ui.setupUi(this);
-	title_bar_ = ErosTitleBar::addToLayout(this, ui.verticalLayout);
 	ui.centralWidget->setMouseTracking(true);
 	this->setWindowTitle(tr("Alpha Version %1").arg(this->local_version_));
 	delete ui.lblLocalPlaceholder;
@@ -78,7 +77,11 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->tray_icon_menu_->addAction(tray_icon_action_show_);
 	this->tray_icon_menu_->addAction(tray_icon_action_close_);
 	this->tray_icon_->setContextMenu(this->tray_icon_menu_);
-	title_bar_->setMenu(this->tray_icon_menu_);
+#if !defined(Q_OS_MAC)
+    title_bar_ = ErosTitleBar::addToLayout(this, ui.verticalLayout);
+    title_bar_->setMenu(this->tray_icon_menu_);
+#endif
+
 
 
 	// File watcher
@@ -208,7 +211,9 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->update_timer_->start();
 
 	notification_sound_ = new QSound(":/sound/notification", this);
-	
+#if defined(Q_OS_MAC)
+    QMessageBox::information(this, tr("Ruh Roh"), tr("Sorry Mac users, but your OS sucks for some things. This means that replays are currently not automatically uploaded. You will have to manually upload your winning replays."));
+#endif
 }
 
 
@@ -221,15 +226,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
+#if !defined(Q_OS_MAC)
 	this->title_bar_->mouseMoveEvent(e);
+#endif
 }
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
+#if !defined(Q_OS_MAC)
 	this->title_bar_->mousePressEvent(e);
+#endif
 }
 void MainWindow::mouseReleaseEvent(QMouseEvent *e)
 {
+#if !defined(Q_OS_MAC)
 	this->title_bar_->mouseReleaseEvent(e);
+#endif
 }
 
 void MainWindow::longProcessTimerWorker()
@@ -361,7 +372,7 @@ void MainWindow::erosAcknowledgedLongProcess()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-	#if !defined(Q_OS_MAC)
+#if !defined(Q_OS_MAC)
 	if (this->tray_icon_->isVisible()) {
 		toggleWindow();
 		event->ignore();
@@ -369,7 +380,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		this->config_->setTrayNotificationShown(true);
 		this->tray_icon_->showMessage("Eros", tr("Eros is still running in the notification tray. Right click the icon if you want to exit."));
 	}
-	#endif
+#else
+    QApplication::exit();
+#endif
 }
 
 void MainWindow::toggleWindow()
@@ -1077,6 +1090,9 @@ void MainWindow::clearWatches()
 }
 void MainWindow::setupWatches()
 {
+#ifdef Q_OS_MAC
+    return
+#endif
 	clearWatches();
 	try {
 		if (this->config_->activeProfile() != nullptr)
@@ -1086,7 +1102,7 @@ void MainWindow::setupWatches()
 			{
 				addWatch(path);
 			}
-		}
+        }
 	} catch (...)
 	{
 		QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to monitor your specified SC2 user folder. Please make sure this application has permission to read it."));
@@ -1126,7 +1142,17 @@ void MainWindow::fileAction(WatchID watchId, const QString &dir, const QString &
 		if(extension.toLower() == "sc2replay")
 		{
 			ui.lblInformation->setText(tr("Uploading %1").arg(filename));
-			QString path = dir + "/" + filename;
+            QFileInfo info(filename);
+            QString path;
+            if (info.isAbsolute())
+            {
+                path = filename;
+            }
+            else
+            {
+                path = dir + "/" + filename;
+            }
+
 
 			QTime time;
 			time.start();

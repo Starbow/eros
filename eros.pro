@@ -20,7 +20,8 @@ SOURCES += main.cpp\
         matchmakingplayerinfo.cpp\
         matchmakingsearchprogresswidget.cpp\
         profile.cpp\
-        settingswindow.cpp
+        settingswindow.cpp\
+        erostitlebar.cpp
 
 HEADERS  += mainwindow.h\
         bnetsettingswindow.h\
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h\
         matchmakingplayerinfo.h\
         matchmakingsearchprogresswidget.h\
         profile.h\
-        settingswindow.h
+        settingswindow.h\
+        erostitlebar.h
 
 
 
@@ -40,7 +42,7 @@ FORMS    += mainwindow.ui\
             chatwidget.ui\
             matchmakingplayerinfo.ui\
             matchmakingsearchprogresswidget.ui\
-
+            erostitlebar.ui
 
 RESOURCES += \
     resources.qrc
@@ -48,10 +50,12 @@ RESOURCES += \
 
 OTHER_FILES +=
 
-macx {
+unix {
     LIBS += -L/usr/local/lib/
     INCLUDEPATH += /usr/local/include/
-    ICON = res/eros.icns
+}
+macx {
+    ICON = res/img/client/icons/eros.icns
     QMAKE_INFO_PLIST = res/data/info.plist
 }
 linux {
