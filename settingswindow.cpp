@@ -4,6 +4,10 @@ SettingsWindow::SettingsWindow(QWidget *parent, Config *cfg)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+	for (int i = 1; i <= 5; i++)
+	{
+		ui.cmbSearchRange->addItem(tr("Within %n division(s)", "", i), i);
+	}
 
 	this->config_ = cfg;
 	
@@ -111,11 +115,8 @@ void SettingsWindow::cmbSearchRange_changed()
 {
 	if (config_->activeProfile() == nullptr)
 	return;
-	QString searchRange = ui.cmbSearchRange->currentText();
 
-
-	config_->activeProfile()->setSearchRange(searchRangeToInt(searchRange));
-	
+	config_->activeProfile()->setSearchRange(ui.cmbSearchRange->currentData().toInt());
 }
 
 void SettingsWindow::cmbAutostart_changed()
@@ -285,9 +286,18 @@ void SettingsWindow::refreshProfileInterface()
 	}
 
 	//set options
-	QString searchRange = intToSearchRange(config_->activeProfile()->searchRange());
 	
-	ui.cmbSearchRange->setCurrentIndex(ui.cmbSearchRange->findText(searchRange));
+	
+	for (int i = 0; i < ui.cmbSearchRange->count(); i++)
+	{
+		if (config_->activeProfile()->searchRange() == ui.cmbSearchRange->itemData(i).toInt())
+		{
+			ui.cmbSearchRange->setCurrentIndex(i);		
+			break;
+		}
+	}
+	if (ui.cmbSearchRange->currentIndex() < 0)
+		ui.cmbSearchRange->setCurrentIndex(0);
 	ui.cmbAutostart->setCurrentIndex(ui.cmbAutostart->findText(boolToYesNo(config_->startOnLogin())));
 	ui.cmbChatLinks->setCurrentIndex(ui.cmbChatLinks->findText(boolToYesNo(this->config_->activeProfile()->chatLinks())));
 	ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findText(this->config_->activeProfile()->language()));
@@ -297,46 +307,6 @@ void SettingsWindow::refreshProfileInterface()
 void SettingsWindow::chkAutoJoin_stateChanged(int state)
 {
 	this->config_->setAutoJoin(state == Qt::CheckState::Checked);
-}
-
-const short int SettingsWindow::searchRangeToInt(QString searchRange)
-{
-	if(searchRange == "Narrow")
-	{
-		return 1;
-	}
-	else if(searchRange == "Normal")
-	{
-		return 2;
-	}
-	else if(searchRange == "Wide")
-	{
-		return 0;
-	}
-	else
-	{
-		return -1; //default is empty
-	}
-}
-
-const QString SettingsWindow::intToSearchRange(const short int searchRange)
-{
-	if(searchRange == 1)
-	{
-		return "Narrow";
-	}
-	else if(searchRange == 2)
-	{
-		return "Normal";
-	}
-	else if(searchRange == 0)		
-	{
-		return "Wide";
-	}
-	else
-	{
-		return "";//default is empty
-	}
 }
 
 const QString SettingsWindow::boolToYesNo(bool yesno)

@@ -45,6 +45,8 @@ private slots:
 
 	void sendMessagePressed();
 
+	void anchorClicked(QUrl);
+
 signals:
 	void sendMessage(ChatRoom *room, const QString message);
 	void sendMessage(User *user, const QString message);

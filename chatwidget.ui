@@ -25,7 +25,10 @@
         <bool>true</bool>
        </property>
        <property name="openExternalLinks">
-        <bool>true</bool>
+        <bool>false</bool>
+       </property>
+       <property name="openLinks">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -68,5 +71,25 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>txtMessages</sender>
+   <signal>anchorClicked(QUrl)</signal>
+   <receiver>ChatWidget</receiver>
+   <slot>anchorClicked(QUrl)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>280</x>
+     <y>201</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>anchorClicked(QUrl)</slot>
+ </slots>
 </ui>

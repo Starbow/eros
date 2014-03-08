@@ -132,6 +132,18 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="0" alignment="Qt::AlignTop">
        <widget class="QFrame" name="frameAutostart">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -196,6 +208,18 @@
       </item>
       <item row="2" column="0" alignment="Qt::AlignTop">
        <widget class="QFrame" name="frameLinks">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -273,23 +297,8 @@
          <item row="0" column="1">
           <widget class="QComboBox" name="cmbSearchRange">
            <property name="currentText">
-            <string>Narrow</string>
+            <string/>
            </property>
-           <item>
-            <property name="text">
-             <string>Narrow</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Normal</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Wide</string>
-            </property>
-           </item>
           </widget>
          </item>
         </layout>
@@ -297,6 +306,18 @@
       </item>
       <item row="3" column="0">
        <widget class="QFrame" name="frameLanguage">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>

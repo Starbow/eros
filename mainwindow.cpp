@@ -464,14 +464,14 @@ void MainWindow::erosRegionStatsUpdated(ErosRegion region, int count)
 
 	if (current_region == region)
 	{
-		ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(count));
+		ui.lblRegionStats->setText(tr("%n people currently queueing on this region.", "", count));
 	}
 }
 
 void MainWindow::erosStatsUpdated(int online, int searching)
 {
 
-	ui.lblRegionStats->setText(tr("%1 people currently online.").arg(online));
+	ui.lblRegionStats->setText(tr("%n people currently online.", "", online));
 	
 }
 
@@ -519,7 +519,7 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 
 	ui.lblVS->setText("VS");
 	ui.lblVS->setMaximumHeight(9999);
-	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
+	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>", "Please keep the link intact.").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
 	ui.lblMapInfo->setText(map);
 	ui.lblMapInfo->setMaximumHeight(9999);
 	ui.btnQueue->setText(tr("Forfeit Match"));
@@ -707,7 +707,7 @@ void MainWindow::erosConnected()
 		}
 		
 
-		ui.cmbMapRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr(vetoes == 1 ? "%1/%2 veto used" : "%1/%2 vetoes used").arg(vetoes).arg(eros_->maxVetoes())), i);
+		ui.cmbMapRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr("%n/%2 veto(es) used", "", vetoes).arg(eros_->maxVetoes())), i);
 
 		if (this->eros_->activeRegions()[i] == pref_region)
 			set_index = i;
@@ -861,9 +861,8 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 
 			setupWatches();
 		}
-	}	
-	
-	if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
+	}
+	else if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
 	{
 		if (widget->chatroom() != nullptr)
 		{
@@ -871,8 +870,7 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 			delete widget;
 		}
 	}
-
-	if(bnetsettings_window_ != nullptr)
+	else if(bnetsettings_window_ != nullptr)
 	{
 		if (ui.tabContainer->widget(index) == bnetsettings_window_)
 		{
@@ -880,7 +878,6 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 			delete bnetsettings_window_;
 			bnetsettings_window_ = nullptr;
 		}
-
 	}
 	
 }
@@ -965,7 +962,13 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 		{
 			int regionIndex = ui.cmbRegion->currentData().toInt();
 			ErosRegion region = eros_->activeRegions()[regionIndex];
-			widget->writeLog(tr("You have been automatically joined to this chat room for your match against <strong>%1</strong> on <a href=\"starcraft://map/%2/%3\">%4</a>. Don't forget to set the game speed to <strong>Faster</strong> when clicking the map link. We suggest joining the channel <strong>%5</strong> on Battle.net. GLHF!").arg(match->opponent()->username(), QString::number((int)region), QString::number(match->mapId()), match->mapName(), match->battleNetChannel()), false); 
+			//Split these up to minimise HTML in translation files.
+			QString map = QString("<a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
+			QString opponent = QString("<strong>%1</strong> <a href=\"http://www.starbowmod.com/ladder/player/%2\" title=\"%3\"><img src=\":/img/client/icons/profile\" /></a>").arg(match->opponent()->username(), QString::number(match->opponent()->id()), tr("View player profile"));
+			QString speed = QString("<strong>%1</strong>").arg(tr("Faster"));
+			QString channel = QString("<strong>%1</strong> <a href=\"clipboard:%1\" title=\"%2\"><img src=\":/img/client/icons/clipboard\" /></a>").arg(match->battleNetChannel(), tr("Copy to clipboard"));
+
+			widget->writeLog(tr("You have been automatically joined to this chat room for your match against %1 on %2. Don't forget to set the game speed to %3 when clicking the map link. We suggest joining the channel %4 on Battle.net. GLHF!").arg(opponent, map, speed, channel), false); 
 		}
 	}
 
@@ -1239,6 +1242,6 @@ void MainWindow::erosVetoesUpdated()
 				vetoes++;
 		}
 
-		ui.cmbMapRegion->setItemText(i, QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr(vetoes == 1 ? "%1/%2 veto used" : "%1/%2 vetoes used").arg(vetoes).arg(eros_->maxVetoes())));
+		ui.cmbMapRegion->setItemText(i, QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr("%n/%2 veto(es) used", "", vetoes).arg(eros_->maxVetoes())));
 	}
 }

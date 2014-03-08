@@ -2,6 +2,9 @@
 
 #include <QScrollBar>
 #include <QTime>
+#include <QDesktopServices>
+#include <QClipboard>
+#include <QMessageBox>
 
 ChatWidget::ChatWidget(Eros *eros, User *user, QWidget *parent)
 	:QWidget(parent)
@@ -87,11 +90,19 @@ void ChatWidget::removeUser(User *user)
 }
 
 void ChatWidget::writeLog(const QString &data, bool sanitize)
-{		
+{	
+	//When appending text in Qt, the new text will take on the same format as the current selection.
+	//Remove the selection cursor and preserve the previous selection for later.
+	QTextCursor cursor = ui.txtMessages->textCursor();
+	ui.txtMessages->setTextCursor(QTextCursor());
+
+	//Remove formatting for the append.
 	QTextCharFormat format;
 	ui.txtMessages->setCurrentCharFormat(format);
+
     if (sanitize)
     {
+		//QString::toHtmlEscaped didn't work too well for our use case.
         QString sanitized(data);
 		sanitized = sanitized.replace("&", "&amp;", Qt::CaseSensitivity::CaseInsensitive);
         sanitized = sanitized.replace("<", "&lt;", Qt::CaseSensitivity::CaseInsensitive);
@@ -103,6 +114,8 @@ void ChatWidget::writeLog(const QString &data, bool sanitize)
     {
         ui.txtMessages->append(QString("<span style=\"color: #cccccc\">[%1]</span> %2").arg(QTime::currentTime().toString("HH:mm:ss"), data));
     }
+	//Apply the previous selection cursor and move the scrollbar to the bottom.
+	ui.txtMessages->setTextCursor(cursor);
     ui.txtMessages->verticalScrollBar()->setValue(ui.txtMessages->verticalScrollBar()->maximum());
 }
 
@@ -175,4 +188,24 @@ void ChatWidget::chatMessageFailed(User *user, const QString message, ErosError 
 {
 	if (this->user_ == user)
 		writeLog(QString("Chat message \"%1\" failed.").arg(user->username()));
+}
+
+void ChatWidget::anchorClicked(QUrl url)
+{
+
+	if (url.scheme() == "clipboard")
+	{
+		QApplication::clipboard()->setText(url.path());
+#if defined(Q_OS_MAC)
+		QString button = tr("Command+V", "Mac OS X paste command");
+#else
+		QString button = tr("Ctrl+V", "Windows and Linux paste command");
+#endif
+
+		QMessageBox::information(this, tr("Clipboard updated"), tr("The text \"%1\" has been copied to your clipboard. Select the join channel textbox in StarCraft II and press %2 to paste the channel name.").arg(url.path(), button));
+	}
+	else
+	{
+		QDesktopServices::openUrl(url);
+	}
 }

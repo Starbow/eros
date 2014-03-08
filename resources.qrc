@@ -47,6 +47,7 @@
     <file alias="min">res/img/client/ui/min.png</file>
   </qresource>
   <qresource prefix="/img/client/icons">
+    <file alias="profile">res/img/client/icons/profile.png</file>
     <file alias="cross">res/img/client/icons/cross.png</file>
     <file alias="clipboard">res/img/client/icons/clipboard.png</file>
     <file alias="icon_1024x1024">res/img/client/icons/eros.iconset/icon_512x512@2x.png</file>
