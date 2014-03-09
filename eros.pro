@@ -21,7 +21,8 @@ SOURCES += main.cpp\
         matchmakingsearchprogresswidget.cpp\
         profile.cpp\
         settingswindow.cpp\
-        erostitlebar.cpp
+        erostitlebar.cpp\
+        directorywatcher.cpp
 
 HEADERS  += mainwindow.h\
         bnetsettingswindow.h\
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h\
         matchmakingsearchprogresswidget.h\
         profile.h\
         settingswindow.h\
-        erostitlebar.h
+        erostitlebar.h\
+        directorywatcher.h
 
 
 
@@ -69,6 +71,6 @@ linux {
 }
 
 
-LIBS += -lQSimpleFileWatcher -leros -lprotobuf
+LIBS += -leros -lprotobuf
 CONFIG += c++11
 

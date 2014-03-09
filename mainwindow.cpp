@@ -54,8 +54,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->matchmaking_start_ = new QTime();
 	this->matchmaking_result_time_ = new QTime();
 	this->long_process_start_time_ = new QTime();
-	this->watcher_ = new QSimpleFileWatcher(this);
-	this->watches_ = QList<WatchID>();
+	this->watcher_ = new DirectoryWatcher(this);
+	this->watches_ = QList<DirectoryWatch*>();
 	this->update_checker_nam_ = new QNetworkAccessManager(this);
 	this->update_timer_ = new QTimer(this);
 	this->long_process_timer_ = new QTimer(this);
@@ -85,7 +85,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 
 
 	// File watcher
-	QObject::connect(this->watcher_, SIGNAL(fileAction(WatchID, const QString &, const QString &, Action )), this, SLOT(fileAction(WatchID, const QString &, const QString, Action)));
+	QObject::connect(this->watcher_, SIGNAL(added(const QString &, const QString &)), this, SLOT(fileAdded(const QString &, const QString&)));
 
 	// Update checker
 	QObject::connect(update_checker_nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(updateCheckerFinished(QNetworkReply*)));
@@ -1114,7 +1114,7 @@ void MainWindow::clearWatches()
 {
 	for (int i = 0; i < this->watches_.count(); i++)
 	{
-		this->watcher_->removeWatch(this->watches_.at(i));
+		this->watcher_->removeWatch(this->watches_.at(i)->directory());
 	}
 
 	this->watches_.clear();
@@ -1163,39 +1163,36 @@ void MainWindow::addWatch(const QString &path)
 	}
 }
 
-void MainWindow::fileAction(WatchID watchId, const QString &dir, const QString &filename, Action action)
+void MainWindow::fileAdded(const QString &dir, const QString &filename)
 {
-	if (action == Action::Add)
+	QStringList pieces = filename.split('.');
+	QString extension = pieces.value(pieces.length()-1);
+
+	if(extension.toLower() == "sc2replay")
 	{
-		QStringList pieces = filename.split('.');
-		QString extension = pieces.value(pieces.length()-1);
+		ui.lblInformation->setText(tr("Uploading %1").arg(filename));
+        QFileInfo info(filename);
+        QString path;
+        if (info.isAbsolute())
+        {
+            path = filename;
+        }
+        else
+        {
+            path = dir + "/" + filename;
+        }
 
-		if(extension.toLower() == "sc2replay")
+
+		QTime time;
+		time.start();
+
+		while (time.elapsed() < 10000)
 		{
-			ui.lblInformation->setText(tr("Uploading %1").arg(filename));
-            QFileInfo info(filename);
-            QString path;
-            if (info.isAbsolute())
-            {
-                path = filename;
-            }
-            else
-            {
-                path = dir + "/" + filename;
-            }
-
-
-			QTime time;
-			time.start();
-
-			while (time.elapsed() < 10000)
-			{
-				// Ugly delay hack.
-				QCoreApplication::processEvents();
-			}
-
-			uploadReplay(path);		
+			// Ugly delay hack.
+			QCoreApplication::processEvents();
 		}
+
+		emit uploadReplay(path);		
 	}
 }
 

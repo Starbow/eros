@@ -134,6 +134,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_util.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="directorywatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_directorywatcher.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_directorywatcher.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -188,6 +197,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="util.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="directorywatcher.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -19,7 +19,8 @@
 #include "bnetsettingswindow.h"
 #include "ui_mainwindow.h"
 #include "erostitlebar.h"
-#include "../QSimpleFileWatcher/qsimplefilewatcher.h"
+#include "directorywatcher.h"
+
 #include "../liberos/eros.h"
 
 
@@ -95,7 +96,7 @@ private slots:
 	void erosReplayUploaded();
 	void erosReplayUploadError(ErosError error);
 	void erosUploadProgress(qint64 written, qint64 total);
-	void fileAction(WatchID watchId, const QString &dir, const QString &filename, Action action);
+	void fileAdded(const QString &dir, const QString &filename);
 
 	void erosLongProcessStateChanged(ErosLongProcessState);
 	void erosDrawRequested();
@@ -172,8 +173,8 @@ private:
 	QString username_;
 	QString authtoken_;
 	QString server_;
-	QSimpleFileWatcher *watcher_;
-	QList<WatchID> watches_;
+	DirectoryWatcher *watcher_;
+	QList<DirectoryWatch*> watches_;
 	QSystemTrayIcon *tray_icon_;
 	QMenu *tray_icon_menu_;
     QAction *tray_icon_action_show_;
