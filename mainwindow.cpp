@@ -11,7 +11,7 @@
 #include "matchmakingplayerinfo.h"
 #include "matchmakingsearchprogresswidget.h"
 #include "erostitlebar.h"
-
+#include "util.h"
 
 MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	: QMainWindow(parent)
@@ -178,6 +178,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	ui.tabContainer->tabBar()->setUsesScrollButtons(true);
 	
 	QObject::connect(ui.tabContainer, SIGNAL(tabCloseRequested(int)), this, SLOT(tabContainer_tabCloseRequested(int)));
+	QObject::connect(ui.tabContainer, SIGNAL(currentChanged(int)), this, SLOT(tabContainer_currentChanged(int)));
 	QObject::connect(ui.lblBottomMenu, SIGNAL(linkActivated(const QString &)), this, SLOT(label_linkActivated(const QString&)));
 	QObject::connect(ui.btnJoinRoom, SIGNAL(clicked()), this, SLOT(btnJoinRoom_pressed()));
 	QObject::connect(ui.lstChats, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(lstChats_currentItemChanged(QListWidgetItem *, QListWidgetItem *)));
@@ -853,6 +854,14 @@ void MainWindow::label_linkActivated(const QString &link)
 	}
 }
 
+void MainWindow::tabContainer_currentChanged(int index)
+{
+	if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
+	{
+		widget->resetEventCount();
+	}
+}
+
 void MainWindow::tabContainer_tabCloseRequested(int index)
 {
 	if (this->settings_window_ != nullptr)
@@ -942,6 +951,34 @@ void MainWindow::btnJoinRoom_pressed()
 	}
 }
 
+void MainWindow::chatEventCountUpdated(ChatWidget *widget)
+{
+	for (int i = 0; i < ui.tabContainer->count(); i++)
+	{
+		if (ChatWidget* tabWidget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(i)))
+		{
+			if (tabWidget == widget)
+			{
+				if (ui.tabContainer->currentIndex() == i && widget->eventCount() > 0)
+				{
+					widget->resetEventCount();
+				}
+
+				if (widget->eventCount() == 0)
+				{
+					ui.tabContainer->setTabText(i, Util::truncateText(widget->name()));
+				}
+				else
+				{
+					ui.tabContainer->setTabText(i, QString("(%1) %2").arg(QString::number(widget->eventCount()), Util::truncateText(widget->name())));
+				}
+
+				break;
+			}
+		}
+	}
+}
+
 void MainWindow::erosChatRoomJoined(ChatRoom *room)
 {
 	for (int i = 0; i < ui.tabContainer->count(); i++)
@@ -957,6 +994,7 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 	}
 
 	ChatWidget *widget = new ChatWidget(this->eros_, room);
+	QObject::connect(widget, SIGNAL(eventCountUpdated(ChatWidget*)), this, SLOT(chatEventCountUpdated(ChatWidget*)));
 	QString icon = ":/img/client/icons/public_chat";
 	if (room->passworded())
 	{
@@ -966,7 +1004,7 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 	{
 		icon = ":/img/client/icons/match_chat";
 	}
-	int id = ui.tabContainer->addTab(widget, QIcon(icon), room->name());
+	int id = ui.tabContainer->addTab(widget, QIcon(icon), Util::truncateText(room->name()));
 	
 	const MatchmakingMatch *match = eros_->matchmakingMatch();
 	if (match != nullptr)
@@ -981,7 +1019,7 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 			QString speed = QString("<strong>%1</strong>").arg(tr("Faster"));
 			QString channel = QString("<strong>%1</strong> <a href=\"clipboard:%1\" title=\"%2\"><img src=\":/img/client/icons/clipboard\" /></a>").arg(match->battleNetChannel(), tr("Copy to clipboard"));
 
-			widget->writeLog(tr("You have been automatically joined to this chat room for your match against %1 on %2. Don't forget to set the game speed to %3 when clicking the map link. We suggest joining the channel %4 on Battle.net. GLHF!").arg(opponent, map, speed, channel), false); 
+			widget->writeLog(tr("You have been automatically joined to this chat room for your match against %1 on %2. Don't forget to set the game speed to %3 when clicking the map link. We suggest joining the channel %4 on Battle.net. GLHF!").arg(opponent, map, speed, channel)); 
 		}
 	}
 

@@ -14,6 +14,7 @@
 #include <QSound>
 
 #include "config.h"
+#include "chatwidget.h"
 #include "settingswindow.h"
 #include "bnetsettingswindow.h"
 #include "ui_mainwindow.h"
@@ -43,6 +44,7 @@ private slots:
 	// UI Slots
 	void label_linkActivated(const QString &link);
 	void tabContainer_tabCloseRequested(int index);
+	void tabContainer_currentChanged(int index);
 	void setUiEnabled(bool);
 	void setQueueState(bool);
 
@@ -82,6 +84,8 @@ private slots:
 	void erosLocalUserUpdated(LocalUser *user);
 
 	void refreshChatRoomList();
+
+	void chatEventCountUpdated(ChatWidget *widget);
 
 	// Matchmaking
 	void erosMatchmakingStateChanged(ErosMatchmakingState status);

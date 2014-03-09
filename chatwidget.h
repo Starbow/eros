@@ -17,19 +17,26 @@ public:
 	void setChatroom(ChatRoom *chatroom);
 	void setUser(User *user);
 
+	void resetEventCount();
 	User *user() const;
 	ChatRoom *chatroom() const;
-    void writeLog(const QString &data, bool sanitize = true);
+    void writeLog(const QString &data);
 
+	int eventCount() const;
+	const QString &name() const;
 private:
 	Ui::ChatWidget ui;
+	Eros *eros_;
 	ChatRoom *chatroom_;
 	User *user_;
 
 	void addUser(User *user);
 	void removeUser(User *user);
-	
-
+	QString getUsername(User *user);
+	QString getColour(User *user);
+	QString colourise(const QString &text, User *user);
+	void addEvent();
+	int events_;
 private slots:
 	
 	void chatMessageReceieved(ChatRoom *room, User *user, const QString message);
@@ -43,6 +50,9 @@ private slots:
 	void chatRoomUserJoined(ChatRoom *room, User *user);
 	void chatRoomUserLeft(ChatRoom *room, User *user);
 
+	void disconnected();
+	void connected();
+
 	void sendMessagePressed();
 
 	void anchorClicked(QUrl);
@@ -50,6 +60,7 @@ private slots:
 signals:
 	void sendMessage(ChatRoom *room, const QString message);
 	void sendMessage(User *user, const QString message);
+	void eventCountUpdated(ChatWidget *widget);
 };
 
 #endif // CHATROOMWIDGET_H
