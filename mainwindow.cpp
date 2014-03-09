@@ -212,9 +212,6 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->update_timer_->start();
 
 	notification_sound_ = new QSound(":/sound/notification", this);
-#if defined(Q_OS_MAC)
-    QMessageBox::information(this, tr("Ruh Roh"), tr("Sorry Mac users, but your OS sucks for some things. This means that replays are currently not automatically uploaded. You will have to manually upload your winning replays."));
-#endif
 }
 
 
@@ -1121,9 +1118,6 @@ void MainWindow::clearWatches()
 }
 void MainWindow::setupWatches()
 {
-#ifdef Q_OS_MAC
-    return
-#endif
 	clearWatches();
 	try {
 		if (this->config_->activeProfile() != nullptr)

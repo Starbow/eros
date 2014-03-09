@@ -22,6 +22,7 @@ SOURCES += main.cpp\
         profile.cpp\
         settingswindow.cpp\
         erostitlebar.cpp\
+        util.cpp\
         directorywatcher.cpp
 
 HEADERS  += mainwindow.h\
@@ -33,6 +34,7 @@ HEADERS  += mainwindow.h\
         profile.h\
         settingswindow.h\
         erostitlebar.h\
+        util.h\
         directorywatcher.h
 
 
