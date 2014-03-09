@@ -1168,7 +1168,7 @@ color: #560d0d;</string>
           </size>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head&gt;&lt;style&gt;a {color: #380404;}&lt;/style&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;| &lt;a href=&quot;#upload&quot;&gt;Manual Replay Upload&lt;/a&gt; | &lt;a href=&quot;#battlenet&quot;&gt;Manage Battle.net accounts&lt;/a&gt; | &lt;a href=&quot;#options&quot;&gt;Options&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head&gt;&lt;style&gt;a {color: #380404;}&lt;/style&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;| &lt;a href=&quot;#upload&quot;&gt;Manual Replay Upload&lt;/a&gt; | &lt;a href=&quot;#battlenet&quot;&gt;Manage Battle.net accounts&lt;/a&gt; | &lt;a href=&quot;#settings&quot;&gt;Settings&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="openExternalLinks">
           <bool>false</bool>

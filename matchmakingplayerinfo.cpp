@@ -7,9 +7,9 @@ MatchmakingPlayerInfo::MatchmakingPlayerInfo(const QString &username, const QStr
 	ui.setupUi(this);
 
 
-
+	ui.lblPoints->setText(tr("%1 points").arg(QLocale().toString(stats->points())));
+	ui.lblDivision->setText(division);
 	ui.lblLocalPlayerLeagueImage->setPixmap(QPixmap(Util::getIcon(username, division)));
-
 	ui.lblPlayerName->setText(username);
 
 	if (flipped) 

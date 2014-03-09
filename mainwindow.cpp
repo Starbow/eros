@@ -198,7 +198,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 		// The user should be prevented from emptying invalid values in the settings dialog.
 	if (this->config_->profiles().count() == 0)
 	{
-		QMessageBox::information(this, "Eros", tr("Welcome to Eros! You need to configure some settings in order to continue. The options window will now open."));
+		QMessageBox::information(this, "Eros", tr("Welcome to Eros! You need to configure some settings in order to continue. The settings window will now open."));
 		openSettings();
 	}
 	else
@@ -829,7 +829,7 @@ void MainWindow::connectionTimerWorker()
 
 void MainWindow::label_linkActivated(const QString &link)
 {
-	if (link == "#options")
+	if (link == "#settings")
 	{
 		openSettings();
 	}
@@ -864,25 +864,22 @@ void MainWindow::tabContainer_currentChanged(int index)
 
 void MainWindow::tabContainer_tabCloseRequested(int index)
 {
-	if (this->settings_window_ != nullptr)
+	if (this->settings_window_ != nullptr && ui.tabContainer->widget(index) == this->settings_window_)
 	{
-		if (ui.tabContainer->widget(index) == this->settings_window_)
+		ui.tabContainer->removeTab(index);
+		delete this->settings_window_;
+		this->settings_window_ = nullptr;
+
+		if (this->eros_->state() == ErosState::ConnectedState)
 		{
-			ui.tabContainer->removeTab(index);
-			delete this->settings_window_;
-			this->settings_window_ = nullptr;
-
-			if (this->eros_->state() == ErosState::ConnectedState)
+			if (this->eros_->localUser()->username().toLower().trimmed() != this->config_->activeProfile()->username().toLower().trimmed())
 			{
-				if (this->eros_->localUser()->username().toLower().trimmed() != this->config_->activeProfile()->username().toLower().trimmed())
-				{
-					emit disconnectFromEros();
-					QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
-				}
+				emit disconnectFromEros();
+				QTimer::singleShot(0, this, SLOT(connectionTimerWorker()));
 			}
-
-			setupWatches();
 		}
+
+		setupWatches();
 	}
 	else if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(index)))
 	{
@@ -892,16 +889,12 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 			delete widget;
 		}
 	}
-	else if(bnetsettings_window_ != nullptr)
+	else if(bnetsettings_window_ != nullptr && ui.tabContainer->widget(index) == bnetsettings_window_)
 	{
-		if (ui.tabContainer->widget(index) == bnetsettings_window_)
-		{
-			ui.tabContainer->removeTab(index);
-			delete bnetsettings_window_;
-			bnetsettings_window_ = nullptr;
-		}
+		ui.tabContainer->removeTab(index);
+		delete bnetsettings_window_;
+		bnetsettings_window_ = nullptr;
 	}
-	
 }
 
 void MainWindow::setUiEnabled(bool enabled)
