@@ -737,7 +737,7 @@ void MainWindow::erosConnected()
 		emit joinChatRoom(room);
 	}
 	setUiEnabled(true);
-	emit refreshChatRooms();
+	QTimer::singleShot(0, this->eros_, SLOT(refreshChatRooms()));
 }
 
 void MainWindow::erosDisconnected()
