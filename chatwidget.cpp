@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include "util.h"
 
-
 ChatWidget::ChatWidget(Eros *eros, User *user, QWidget *parent)
 	:QWidget(parent)
 {
@@ -217,7 +216,8 @@ void ChatWidget::writeLog(const QString &data)
 	//Remove the selection cursor and preserve the previous selection for later.
 	QTextCursor cursor = ui.txtMessages->textCursor();
 	QScrollBar *bar = ui.txtMessages->verticalScrollBar();
-	bool shouldScroll = bar->value() != bar->maximum();
+	bool shouldScroll = (bar->value() == bar->maximum());
+	int barValue = bar->value();
 	ui.txtMessages->setTextCursor(QTextCursor());
 
 	//Remove formatting for the append.
@@ -227,11 +227,15 @@ void ChatWidget::writeLog(const QString &data)
 
     ui.txtMessages->append(QString("<span style=\"color: #cccccc\">[%1]</span> %2").arg(QTime::currentTime().toString("HH:mm:ss"), data));
 	//Apply the previous selection cursor and move the scrollbar to the bottom.
-	ui.txtMessages->setTextCursor(cursor);
 
+	ui.txtMessages->setTextCursor(cursor);
 	if (shouldScroll)
 	{
 		bar->setValue(bar->maximum());
+	}
+	else
+	{
+		bar->setValue(barValue);
 	}
 	addEvent();
 }
