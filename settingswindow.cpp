@@ -1,12 +1,24 @@
 #include "settingswindow.h"
 #include <QFileDialog>
+#include <QDir>
+#include <QLocale>
 SettingsWindow::SettingsWindow(QWidget *parent, Config *cfg)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
-	for (int i = 1; i <= 5; i++)
+
+	QString language_path = QString("%1/languages").arg(QApplication::applicationDirPath());
+	QDir language_dir(language_path);
+
+	QStringList language_files = language_dir.entryList(QStringList("*.qm"), QDir::Filter::Files);
+	for (int i = 0; i < language_files.size(); i++)
 	{
-		ui.cmbSearchRange->addItem(tr("Within %n division(s)", "", i), i);
+		QString locale_name = language_files[i];
+		locale_name.truncate(locale_name.lastIndexOf('.'));
+		QLocale locale(locale_name);
+		QString country = locale.name();
+		country.remove(0, country.indexOf('_') + 1);
+		ui.cmbLanguage->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(country.toLower())), locale.nativeLanguageName(), locale_name);
 	}
 
 	this->config_ = cfg;
@@ -34,6 +46,19 @@ SettingsWindow::SettingsWindow(QWidget *parent, Config *cfg)
 SettingsWindow::~SettingsWindow()
 {
 	config_->save();
+}
+
+void SettingsWindow::changeEvent(QEvent* e)
+{
+	if (e != nullptr)
+	{
+		switch (e->type())
+		{
+		case QEvent::LanguageChange:
+			ui.retranslateUi(this);
+			break;
+		}
+	}
 }
 
 void SettingsWindow::cmbProfiles_changed()
@@ -149,7 +174,8 @@ void SettingsWindow::cmbLanguage_changed()
 {
 	if (config_->activeProfile() == nullptr)
 		return;
-	config_->activeProfile()->setLanguage(ui.cmbLanguage->currentText());
+	config_->activeProfile()->setLanguage(ui.cmbLanguage->currentData().toString());
+	refreshProfileInterface();
 }
 
 void SettingsWindow::btnOK_click()
@@ -287,7 +313,12 @@ void SettingsWindow::refreshProfileInterface()
 
 	//set options
 	
-	
+	ui.cmbSearchRange->clear();
+	for (int i = 1; i <= 5; i++)
+	{
+		ui.cmbSearchRange->addItem(tr("Within %n division(s)", "", i), i);
+	}
+
 	for (int i = 0; i < ui.cmbSearchRange->count(); i++)
 	{
 		if (config_->activeProfile()->searchRange() == ui.cmbSearchRange->itemData(i).toInt())
@@ -300,7 +331,10 @@ void SettingsWindow::refreshProfileInterface()
 		ui.cmbSearchRange->setCurrentIndex(0);
 	ui.cmbAutostart->setCurrentIndex(ui.cmbAutostart->findText(boolToYesNo(config_->startOnLogin())));
 	ui.cmbChatLinks->setCurrentIndex(ui.cmbChatLinks->findText(boolToYesNo(this->config_->activeProfile()->chatLinks())));
-	ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findText(this->config_->activeProfile()->language()));
+	int pos = ui.cmbLanguage->findData(this->config_->activeProfile()->language());
+	if (pos < 0)
+		pos = ui.cmbLanguage->findData("en_GB");
+	ui.cmbLanguage->setCurrentIndex(pos);
 	ui.txtWatchFolder->setText(this->config_->activeProfile()->replayFolder());
 }
 

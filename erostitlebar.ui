@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <property name="styleSheet">
    <string notr="true">#titleBar
@@ -155,7 +155,7 @@ QPushButton::hover
          </size>
         </property>
         <property name="text">
-         <string>Title</string>
+         <string notr="true">Title</string>
         </property>
        </widget>
       </item>

@@ -1,5 +1,5 @@
 #include "config.h"
-
+#include <QApplication>
 #define EROS_DEFAULT_SERVER "eros.starbowmod.com:1337"
 
 Config::Config(QObject *parent)
@@ -9,12 +9,14 @@ Config::Config(QObject *parent)
 	this->active_profile_ = nullptr;
 	this->start_on_login_ = false;
 	this->settings_ = new QSettings(QSettings::Format::IniFormat, QSettings::Scope::UserScope, "Starbow", "Eros");
+	this->translator_ = nullptr;
 
 	int profile_count = this->settings_->beginReadArray("profile");
 	for (int i = 0; i < profile_count; i++)
 	{
 		this->settings_->setArrayIndex(i);
 		Profile *profile = new Profile(this, this->settings_, false);
+		QObject::connect(profile, SIGNAL(languageChanged(const QString &)), this, SLOT(setLanguage(const QString &)));
 		this->profiles_ << profile;
 	}
 	this->settings_->endArray();
@@ -27,6 +29,7 @@ Config::Config(QObject *parent)
 	if (active_profile_id > 0 && active_profile_id <= this->profiles_.count())
 	{
 		this->active_profile_ = this->profiles_[active_profile_id-1];
+		this->setLanguage(this->active_profile_->language());
 	} 
 	this->server_ = this->settings_->value("server", EROS_DEFAULT_SERVER).toString();
 }
@@ -34,6 +37,26 @@ Config::Config(QObject *parent)
 Config::~Config()
 {
 
+}
+
+void Config::setLanguage(const QString &language)
+{
+	if (this->current_language_ != language)
+	{
+		this->current_language_ = language;
+
+		QLocale locale(language);
+		QLocale::setDefault(locale);
+
+		if (this->translator_ != nullptr)
+			QApplication::removeTranslator(this->translator_);
+		else
+			this->translator_ = new QTranslator();
+		
+
+		if (this->translator_->load(QString("%1.qm").arg(language), QString("%1/languages").arg(QApplication::applicationDirPath())))
+			QApplication::installTranslator(this->translator_);
+	}
 }
 
 
@@ -69,6 +92,7 @@ void Config::setActiveProfile(Profile * profile)
 	if (this->active_profile_ != profile)
 	{
 		this->active_profile_ = profile;
+		this->setLanguage(profile->language());
 		emit activeProfileChanged(profile);
 	}
 	
@@ -111,6 +135,7 @@ void Config::save()
 Profile *Config::createProfile(const QString &username)
 {
 	Profile *profile = new Profile(this, this->settings_);
+	QObject::connect(profile, SIGNAL(languageChanged(const QString &)), this, SLOT(setLanguage(const QString &)));
 	profile->setUsername(username);
 	this->profiles_ << profile;
 	return profile;

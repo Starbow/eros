@@ -55,6 +55,7 @@ private:
 
 	const QString boolToYesNo(bool yesno);
 
+	void changeEvent(QEvent* e);
 signals:
 	void profileChanged();
 };

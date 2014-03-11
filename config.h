@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QSettings>
 #include <QList>
+#include <QLocale>
+#include <QTranslator>
 #include "profile.h"
 
 class Config : public QObject
@@ -41,7 +43,11 @@ private:
 	QString server_;
 	int preferred_region_;
 	bool tray_notification_shown_;
+	QString current_language_;
+	QTranslator *translator_;
 	
+public slots:
+	void setLanguage(const QString &language);
 
 signals:
 	void activeProfileChanged(Profile *profile);

@@ -84,7 +84,11 @@ void Profile::setReplayFolder(const QString &folder)
 }
 void Profile::setLanguage(const QString &language)
 {
-	this->language_ = language;
+	if (this->language_ != language)
+	{
+		this->language_ = language;
+		emit languageChanged(language);
+	}
 }
 void Profile::setChatLinks(bool chatlinks)
 {

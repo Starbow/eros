@@ -37,6 +37,9 @@ private:
 	QString language_;
 	QString replay_folder_;
 	int search_range_;	
+
+signals:
+	void languageChanged(const QString &language);
 };
 
 #endif // EROS_PROFILE_H

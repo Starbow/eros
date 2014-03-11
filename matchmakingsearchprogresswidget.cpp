@@ -19,8 +19,8 @@ MatchmakingSearchProgressWidget::~MatchmakingSearchProgressWidget()
 
 void MatchmakingSearchProgressWidget::statsUpdated(int active, int searching)
 {
-	ui.lblOnline->setText(tr("%1 online").arg(active));
-	ui.lblSearching->setText(tr("%1 searching").arg(searching));
+	ui.lblOnline->setText(tr("%n (person/people) online", "", active));
+	ui.lblSearching->setText(tr("%n (person/people) searching", "", searching));
 }
 
 void MatchmakingSearchProgressWidget::timerElapsed()
@@ -29,5 +29,5 @@ void MatchmakingSearchProgressWidget::timerElapsed()
 	if (this->ticks_ == 4)
 		this->ticks_ = 1;
 
-	ui.lblHeader->setText(tr("Searching%1").arg(QString(this->ticks_, '.')));
+	ui.lblHeader->setText(QString("%1%2").arg(tr("Searching"), QString(this->ticks_, '.')));
 }

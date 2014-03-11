@@ -42,8 +42,6 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	ui.setupUi(this);
 	ui.centralWidget->setMouseTracking(true);
 	this->setWindowTitle(tr("Alpha Version %1").arg(this->local_version_));
-	delete ui.lblLocalPlaceholder;
-	delete ui.lblRemotePlaceholder;
 
 	setUiEnabled(false);
 	this->eros_ = eros;
@@ -219,6 +217,21 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::changeEvent(QEvent* e)
+{
+	if (e != nullptr)
+	{
+		switch (e->type())
+		{
+		case QEvent::LanguageChange:
+			ui.retranslateUi(this);
+			this->setWindowTitle(tr("Alpha Version %1").arg(this->local_version_));
+			erosStateChanged(this->eros_->state());
+			break;
+		}
+	}
 }
 
 
@@ -475,14 +488,14 @@ void MainWindow::erosRegionStatsUpdated(ErosRegion region, int count)
 
 	if (current_region == region)
 	{
-		ui.lblRegionStats->setText(tr("%n people currently queueing on this region.", "", count));
+		ui.lblRegionStats->setText(tr("%n (person/people) currently queueing on this region.", "", count));
 	}
 }
 
 void MainWindow::erosStatsUpdated(int online, int searching)
 {
 
-	ui.lblRegionStats->setText(tr("%n people currently online.", "", online));
+	ui.lblRegionStats->setText(tr("%n (person/people) currently online.", "", online));
 	
 }
 
@@ -625,8 +638,15 @@ void MainWindow::btnQueue_pressed()
 
 void MainWindow::cmbRegion_currentIndexChanged (int index)
 {
+	if (index < 0)
+		return;
+
+	if (eros_->state() != ErosState::ConnectedState)
+		return;
+
 	LocalUser *user = eros_->localUser();
 	int regionIndex = ui.cmbRegion->currentData().toInt();
+	
 	ErosRegion region = eros_->activeRegions()[regionIndex];
 
 	if (user != nullptr)
@@ -650,6 +670,9 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 
 void MainWindow::cmbMapRegion_currentIndexChanged (int index)
 {
+	if (this->eros_->state() != ErosState::ConnectedState)
+		return;
+
 	ui.lstMaps->clear();
 
 	if (index < 0)
@@ -718,7 +741,7 @@ void MainWindow::erosConnected()
 		}
 		
 
-		ui.cmbMapRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr("%n/%2 veto(es) used", "", vetoes).arg(eros_->maxVetoes())), i);
+		ui.cmbMapRegion->addItem(QIcon(QString(":/img/client/icons/flags/%1").arg(Eros::regionToString(this->eros_->activeRegions()[i]))), QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr("%1/%n veto(es) used", "", eros_->maxVetoes()).arg(vetoes)), i);
 
 		if (this->eros_->activeRegions()[i] == pref_region)
 			set_index = i;
@@ -1290,6 +1313,6 @@ void MainWindow::erosVetoesUpdated()
 				vetoes++;
 		}
 
-		ui.cmbMapRegion->setItemText(i, QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr("%n/%2 veto(es) used", "", vetoes).arg(eros_->maxVetoes())));
+		ui.cmbMapRegion->setItemText(i, QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr("%1/%n veto(es) used", "", eros_->maxVetoes()).arg(vetoes)));
 	}
 }

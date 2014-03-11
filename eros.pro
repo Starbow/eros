@@ -76,3 +76,6 @@ linux {
 LIBS += -leros -lprotobuf
 CONFIG += c++11
 
+TRANSLATIONS += translations/eros_en_GB.ts\
+                translations/eros_ko_KR.ts\
+                translations/eros_blank.ts

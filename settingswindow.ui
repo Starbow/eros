@@ -307,7 +307,7 @@
       <item row="3" column="0">
        <widget class="QFrame" name="frameLanguage">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -315,7 +315,7 @@
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>0</height>
+          <height>16777215</height>
          </size>
         </property>
         <property name="frameShape">
@@ -345,13 +345,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="cmbLanguage">
-           <item>
-            <property name="text">
-             <string>English</string>
-            </property>
-           </item>
-          </widget>
+          <widget class="QComboBox" name="cmbLanguage"/>
          </item>
         </layout>
        </widget>

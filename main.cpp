@@ -5,6 +5,9 @@
 #include <QtWidgets/QApplication>
 #include <QThread>
 #include <QStandardPaths>
+#include <QLocale>
+#include <QTextCodec>
+#include <QTranslator>
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
@@ -18,6 +21,9 @@ int main(int argc, char *argv[])
 	#elif defined(Q_OS_LINUX)
 		CrashHandler::instance()->Init(QCoreApplication::applicationDirPath());
 	#endif
+
+	QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
+
 	Eros *eros = new Eros(0);
 	QThread *erosThread = new QThread();
 	eros->moveToThread(erosThread);
