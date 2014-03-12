@@ -61,6 +61,8 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->tray_icon_menu_ = new QMenu(this);
 	this->preview_loader_nam_ = new QNetworkAccessManager(this);
 	this->preview_cache_ = QMap<QString, QPixmap*>();
+	this->upload_queue_ = QMap<QString, QTime*>();
+	this->upload_queue_timer_ = new QTimer(this);
 
 	tray_icon_action_show_ = new QAction("Hide Eros", this);
 	tray_icon_action_close_ = new QAction("Close Eros", this);
@@ -75,6 +77,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	this->tray_icon_menu_->addAction(tray_icon_action_show_);
 	this->tray_icon_menu_->addAction(tray_icon_action_close_);
 	this->tray_icon_->setContextMenu(this->tray_icon_menu_);
+
 #if !defined(Q_OS_MAC)
     title_bar_ = ErosTitleBar::addToLayout(this, ui.verticalLayout);
     title_bar_->setMenu(this->tray_icon_menu_);
@@ -152,6 +155,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this->connection_timer_, SIGNAL(timeout()), this, SLOT(connectionTimerWorker()));
 	QObject::connect(this->matchmaking_timer_, SIGNAL(timeout()), this, SLOT(matchmakingTimerWorker()));
 	QObject::connect(this->long_process_timer_, SIGNAL(timeout()), this, SLOT(longProcessTimerWorker()));
+	QObject::connect(this->upload_queue_timer_, SIGNAL(timeout()), this, SLOT(uploadTimerWorker()));
 
 	this->long_process_timer_->setInterval(250);
 
@@ -229,6 +233,8 @@ void MainWindow::changeEvent(QEvent* e)
 			ui.retranslateUi(this);
 			this->setWindowTitle(tr("Alpha Version %1").arg(this->local_version_));
 			erosStateChanged(this->eros_->state());
+			if (this->eros_->state() == ErosState::ConnectedState)
+				erosConnected();
 			break;
 		}
 	}
@@ -252,6 +258,21 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *e)
 #if !defined(Q_OS_MAC)
 	this->title_bar_->mouseReleaseEvent(e);
 #endif
+}
+
+void MainWindow::uploadTimerWorker()
+{
+	
+	QMutableMapIterator<QString, QTime*> i(this->upload_queue_);
+	while (i.hasNext())
+	{
+		i.next();
+		if (i.value()->elapsed() > 5000)
+		{
+			emit uploadReplay(i.key());
+			i.remove();
+		}
+	}
 }
 
 void MainWindow::longProcessTimerWorker()
@@ -761,6 +782,7 @@ void MainWindow::erosConnected()
 	}
 	setUiEnabled(true);
 	QTimer::singleShot(0, this->eros_, SLOT(refreshChatRooms()));
+	this->upload_queue_timer_->start(250);
 }
 
 void MainWindow::erosDisconnected()
@@ -770,6 +792,7 @@ void MainWindow::erosDisconnected()
 	ui.lstChats->clear();
 	ui.lstMaps->clear();
 	this->selected_map_ = nullptr;
+	this->upload_queue_timer_->stop();
 }
 
 void MainWindow::erosAuthenticationFailed()
@@ -1074,7 +1097,7 @@ void MainWindow::openBnetSettings()
 	if(bnetsettings_window_ == nullptr)
 	{
 		bnetsettings_window_ = new BnetSettingsWindow(this, this->eros_);
-		ui.tabContainer->insertTab(3, bnetsettings_window_, "Battle.net Accounts");
+		ui.tabContainer->insertTab(3, bnetsettings_window_, tr("Battle.net Accounts"));
 		ui.tabContainer->setCurrentIndex(3);		
 	}
 	else
@@ -1095,7 +1118,7 @@ void MainWindow::openSettings()
 	{
 		this->settings_window_ = new SettingsWindow(this, this->config_);
 		QObject::connect(this->settings_window_, SIGNAL(profileChanged()), this, SLOT(activeProfileChanged()));
-		ui.tabContainer->insertTab(3, this->settings_window_, "Settings");
+		ui.tabContainer->insertTab(3, this->settings_window_, tr("Settings"));
 		ui.tabContainer->setCurrentIndex(3);
 	} 
 	else
@@ -1200,16 +1223,12 @@ void MainWindow::fileAdded(const QString &dir, const QString &filename)
         }
 
 
-		QTime time;
-		time.start();
-
-		while (time.elapsed() < 10000)
+		if (!this->upload_queue_.contains(path))
 		{
-			// Ugly delay hack.
-			QCoreApplication::processEvents();
+			QTime *now = new QTime();
+			now->start();
+			this->upload_queue_.insert(path, now);
 		}
-
-		emit uploadReplay(path);		
 	}
 }
 
@@ -1296,7 +1315,7 @@ void MainWindow::btnToggleVeto_clicked()
 
 void MainWindow::erosToggleVetoFailed(Map* map, ErosError error)
 {
-	QMessageBox::information(this, tr("Veto Update Failed"), tr("Failed to update veto for \"%1\". %2").arg(map->name(), Eros::errorString(error)));
+	QMessageBox::information(this, tr("Veto Update Failed"), tr("Failed to update veto for \"%1\". %2", "%1 is the map name. %2 is an error message (found in liberos).").arg(map->name(), Eros::errorString(error)));
 	ui.btnToggleVeto->setEnabled(true);
 }
 void MainWindow::erosVetoesUpdated()

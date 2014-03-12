@@ -334,7 +334,7 @@ QLineEdit:focus
                  <item row="3" column="0">
                   <widget class="QLabel" name="lblRegionStats">
                    <property name="text">
-                    <string>0 people queueing on this region.</string>
+                    <string notr="true"/>
                    </property>
                   </widget>
                  </item>
@@ -385,16 +385,6 @@ QLineEdit:focus
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>North America</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Europe</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                     <item>

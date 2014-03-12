@@ -63,6 +63,7 @@ private slots:
 	void connectionTimerWorker();
 	void matchmakingTimerWorker();
 	void longProcessTimerWorker();
+	void uploadTimerWorker();
 
 	void openBnetSettings();
 	void openSettings();
@@ -184,6 +185,8 @@ private:
 	QNetworkAccessManager *preview_loader_nam_;
 	QMap<QString, QPixmap*> preview_cache_;
 	Map *selected_map_;
+	QMap<QString, QTime*> upload_queue_;
+	QTimer *upload_queue_timer_;
 
 	int local_version_;
 
