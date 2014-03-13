@@ -108,6 +108,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(chatRoomRemoved(ChatRoom*)), this, SLOT(erosChatRoomRemoved(ChatRoom*)));
 	QObject::connect(eros_, SIGNAL(chatRoomJoined(ChatRoom*)), this, SLOT(erosChatRoomJoined(ChatRoom*)));
 	QObject::connect(eros_, SIGNAL(chatRoomLeft(ChatRoom*)), this, SLOT(erosChatRoomLeft(ChatRoom*)));
+	QObject::connect(eros_, SIGNAL(chatMessageReceieved(User*, const QString)), this, SLOT(erosChatMessageReceieved(User*, const QString)));
 	QObject::connect(eros_, SIGNAL(localUserUpdated(LocalUser*)), this, SLOT(erosLocalUserUpdated(LocalUser*)));
 	QObject::connect(eros_, SIGNAL(matchmakingStateChanged(ErosMatchmakingState)), this, SLOT(erosMatchmakingStateChanged(ErosMatchmakingState)));
 	QObject::connect(eros_, SIGNAL(matchmakingMatchFound(MatchmakingMatch *)), this, SLOT(erosMatchmakingMatchFound(MatchmakingMatch *)));
@@ -929,8 +930,9 @@ void MainWindow::tabContainer_tabCloseRequested(int index)
 		if (widget->chatroom() != nullptr)
 		{
 			emit leaveChatRoom(widget->chatroom());
-			delete widget;
 		}
+		
+		delete widget;
 	}
 	else if(bnetsettings_window_ != nullptr && ui.tabContainer->widget(index) == bnetsettings_window_)
 	{
@@ -1015,6 +1017,43 @@ void MainWindow::chatEventCountUpdated(ChatWidget *widget)
 	}
 }
 
+void MainWindow::privateChatRequested(User *user)
+{
+	openPrivateChat(user, true);
+}
+
+ChatWidget *MainWindow::openPrivateChat(User *user, bool activate, const QString &initial_message)
+{
+	for (int i = 0; i < ui.tabContainer->count(); i++)
+	{
+		if (ChatWidget* widget = dynamic_cast<ChatWidget*>(ui.tabContainer->widget(i)))
+		{
+			if (widget->user() != nullptr && widget->user()->username() == user->username())
+			{
+				if (widget->user() != user)
+				{
+					widget->setUser(user);
+					widget->chatMessageReceieved(user, initial_message);
+				}
+
+				if (activate)
+					this->ui.tabContainer->setCurrentIndex(i);
+
+				return widget;
+			}
+		}
+	}
+
+	ChatWidget *widget = new ChatWidget(this->eros_, user, initial_message);
+	QObject::connect(widget, SIGNAL(eventCountUpdated(ChatWidget*)), this, SLOT(chatEventCountUpdated(ChatWidget*)));
+	
+	int id = ui.tabContainer->addTab(widget, QIcon(":/img/client/icons/private_chat"), Util::truncateText(user->username()));
+	if (activate)
+		this->ui.tabContainer->setCurrentIndex(id);
+
+	return widget;
+}
+
 void MainWindow::erosChatRoomJoined(ChatRoom *room)
 {
 	for (int i = 0; i < ui.tabContainer->count(); i++)
@@ -1031,6 +1070,7 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 
 	ChatWidget *widget = new ChatWidget(this->eros_, room);
 	QObject::connect(widget, SIGNAL(eventCountUpdated(ChatWidget*)), this, SLOT(chatEventCountUpdated(ChatWidget*)));
+	QObject::connect(widget, SIGNAL(privateChatRequested(User *)), this, SLOT(privateChatRequested(User *)));
 	QString icon = ":/img/client/icons/public_chat";
 	if (room->passworded())
 	{
@@ -1069,6 +1109,12 @@ void MainWindow::erosChatRoomLeft(ChatRoom *room)
 {
 
 }
+
+void MainWindow::erosChatMessageReceieved(User *user, const QString message)
+{
+	openPrivateChat(user, false, message);
+}
+
 void MainWindow::erosChatRoomAdded(ChatRoom *room)
 {
 	QListWidgetItem *item = new QListWidgetItem(room->name());

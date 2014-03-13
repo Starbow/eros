@@ -31,6 +31,7 @@ class MainWindow : public QMainWindow
 public:
 	MainWindow(Eros *eros, QWidget *parent = 0);
 	~MainWindow();
+	ChatWidget *openPrivateChat(User *user, bool activate = false, const QString &initial_message = "");
 
 private slots:
 
@@ -82,6 +83,7 @@ private slots:
 	void erosChatRoomLeft(ChatRoom *room);
 	void erosChatRoomAdded(ChatRoom *room);
 	void erosChatRoomRemoved(ChatRoom *room);
+	void erosChatMessageReceieved(User *user, const QString message);
 
 	void erosLocalUserUpdated(LocalUser *user);
 
@@ -89,6 +91,7 @@ private slots:
 
 	void chatEventCountUpdated(ChatWidget *widget);
 
+	void privateChatRequested(User *user);
 	// Matchmaking
 	void erosMatchmakingStateChanged(ErosMatchmakingState status);
 	void erosMatchmakingMatchFound(MatchmakingMatch *match);
@@ -201,6 +204,8 @@ private:
 	void mouseReleaseEvent(QMouseEvent *e);
 
 	void changeEvent(QEvent* e);
+
+
 };
 
 #endif // EROS_H

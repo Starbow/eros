@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include "util.h"
 
-ChatWidget::ChatWidget(Eros *eros, User *user, QWidget *parent)
+ChatWidget::ChatWidget(Eros *eros, User *user, const QString &initial_message, QWidget *parent)
 	:QWidget(parent)
 {
 	this->eros_ = eros;
@@ -26,10 +26,14 @@ ChatWidget::ChatWidget(Eros *eros, User *user, QWidget *parent)
 	QObject::connect(eros, SIGNAL(connected()), this, SLOT(connected()));
 
 	QObject::connect(this, SIGNAL(sendMessage(User *, const QString)), eros, SLOT(sendMessage(User *, const QString)));
-	
+
 	
 	QObject::connect(ui.btnSend, SIGNAL(pressed()), this, SLOT(sendMessagePressed()));
 	QObject::connect(ui.txtInput, SIGNAL(returnPressed()), this, SLOT(sendMessagePressed()));
+
+	if (!initial_message.isEmpty())
+		chatMessageReceieved(user, initial_message);
+	
 }
 ChatWidget::ChatWidget(Eros *eros, ChatRoom *chatroom, QWidget *parent)
 	:QWidget(parent)
@@ -50,10 +54,23 @@ ChatWidget::ChatWidget(Eros *eros, ChatRoom *chatroom, QWidget *parent)
 	QObject::connect(eros, SIGNAL(connected()), this, SLOT(connected()));
 
 	QObject::connect(this, SIGNAL(sendMessage(ChatRoom *, const QString)), eros, SLOT(sendMessage(ChatRoom *, const QString)));
+	QObject::connect(this, SIGNAL(sendMessage(User *, const QString)), eros, SLOT(sendMessage(User *, const QString)));
 
 	QObject::connect(ui.btnSend, SIGNAL(pressed()), this, SLOT(sendMessagePressed()));
 	QObject::connect(ui.txtInput, SIGNAL(returnPressed()), this, SLOT(sendMessagePressed()));
-	const QList<User *> &users = chatroom->participants();
+	QObject::connect(ui.listUsers, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(userDoubleClicked(QListWidgetItem*)));
+	
+	populateUserList();
+}
+
+ChatWidget::~ChatWidget()
+{
+
+}
+
+void ChatWidget::populateUserList()
+{
+	const QList<User *> &users = this->chatroom_->participants();
 	for (int i = 0; i < users.size(); i++)
 	{
 		User *user = users.at(i);
@@ -64,9 +81,13 @@ ChatWidget::ChatWidget(Eros *eros, ChatRoom *chatroom, QWidget *parent)
 	this->ui.listUsers->sortItems();
 }
 
-ChatWidget::~ChatWidget()
+void ChatWidget::userDoubleClicked(QListWidgetItem *item)
 {
-
+	if (item != nullptr)
+	{
+		User *user = eros_->getUser(item->text());
+		emit privateChatRequested(user);
+	}
 }
 
 int ChatWidget::eventCount() const
@@ -103,6 +124,7 @@ void ChatWidget::connected()
 	if (this->chatroom_ != nullptr)
 	{
 		ui.listUsers->clear();
+		populateUserList();
 		writeLog(tr("You have reconnected to the server. You may need to re-join the channel."));
 	}
 	else
@@ -154,16 +176,39 @@ QString ChatWidget::getColour(User *user)
 
 QString ChatWidget::getUsername(User *user)
 {
-	const QPair <int, QString> &division = this->eros_->divisions()->division(user->ladderStatsGlobal()->points());
-	// Add special icons.
-	return QString("<a title=\"%1\"><strong>%2</strong></a>").arg(division.second, Util::sanitizeHtml(user->username()));
+	const UserLadderStats *stats = user->ladderStatsGlobal();
+	if (stats == nullptr)
+	{
+		return QString("<strong>%2</strong>").arg(Util::sanitizeHtml(user->username()));
+	}
+	else
+	{
+		const QPair <int, QString> &division = this->eros_->divisions()->division(stats->points());
+		// Add special icons.
+		return QString("<a title=\"%1\"><strong>%2</strong></a>").arg(division.second, Util::sanitizeHtml(user->username()));
+	}
 }
 
-QString ChatWidget::colourise(const QString &data, User *user)
+QString ChatWidget::colourise(const QString &data, User *user, bool sending)
 {
-	return QString("<span style=\"color: %1\">%2</span>").arg(getColour(user), data);
-}
+	QString colour = "";
+	if (this->chatroom_ != nullptr)
+	{
+		if (user == eros_->localUser())
+			colour = "#000000";
+		else
+			colour = getColour(user);
+	}
+	else
+	{
+		if (sending)
+			colour = "#000000";
+		else
+			colour = getColour(user);
+	}
 
+	return QString("<span style=\"color: %1\">%2</span>").arg(colour, data);
+}
 
 ChatRoom *ChatWidget::chatroom() const
 {
@@ -246,13 +291,56 @@ void ChatWidget::sendMessagePressed()
 
 	if (!message.isEmpty())
 	{
-		if (this->user_ != nullptr)
-			emit sendMessage(this->user_, message);
-		
-		if (this->chatroom_ != nullptr)
-			emit sendMessage(this->chatroom_, message);
 
-		//writeLog(QString("%1: %2").arg( "Me" , message ));
+		if (message[0] == '/')
+		{
+			QStringList commands = message.split(" ");
+			QString command = commands[0].toLower();
+			command.remove(0, 1);
+			
+			if (command == "help")
+			{
+				writeLog(tr("/w <name> <message> - Send a private message."));
+				writeLog(tr("/msg <name> <message> - Send a private message."));
+			}
+			else if (command == "w" || command == "msg")
+			{
+				if (commands.length() < 3)
+				{
+					writeLog(tr("Cannot perform command. Not enough arguments."));
+					return;
+				}
+
+				QString username = commands[1];
+				commands.removeFirst();
+				commands.removeFirst();
+
+				message = commands.join(" ").trimmed();
+				if (message == "")
+				{
+					writeLog(tr("Cannot perform command. Not enough arguments."));
+					return;
+				}
+				else
+				{
+					User *user = eros_->getUser(username);
+					emit sendMessage(user, message);
+					if (this->user_ != user)
+					{
+						writeLog(colourise(QString("-> %1: %2").arg(getUsername(user), Util::sanitizeHtml(message)), this->eros_->localUser(), true));
+					}
+				}
+			}		
+		}
+		else
+		{
+			if (this->user_ != nullptr)
+				emit sendMessage(this->user_, message);
+		
+			if (this->chatroom_ != nullptr)
+				emit sendMessage(this->chatroom_, message);
+		}
+		
 	}
 
 	ui.txtInput->clear();
@@ -296,7 +384,7 @@ void ChatWidget::chatMessageSent(User *user, const QString message)
 {
 	if (this->user_ == user)
 	{
-		writeLog(colourise(QString("%1: %2").arg(getUsername(user), Util::sanitizeHtml(message)), user));
+		writeLog(colourise(QString("%1: %2").arg(getUsername(this->eros_->localUser()), Util::sanitizeHtml(message)), user, true));
 	}
 }
 
@@ -327,7 +415,8 @@ void ChatWidget::anchorClicked(QUrl url)
 		QString button = tr("Ctrl+V", "Windows and Linux paste command");
 #endif
 
-		QMessageBox::information(this, tr("Clipboard updated"), tr("The text \"%1\" has been copied to your clipboard. Select the join channel textbox in StarCraft II and press %2 to paste the channel name.").arg(url.path(), button));
+		QString text = QString("<strong>%1</strong>").arg(url.path());
+		writeLog(tr("The text \"%1\" has been copied to your clipboard. Select the join channel textbox in StarCraft II and press %2 to paste the channel name.").arg(text, button));
 	}
 	else
 	{

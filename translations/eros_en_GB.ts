@@ -74,59 +74,65 @@ Error %2: %3</source>
 <context>
     <name>ChatWidget</name>
     <message>
-        <location filename="../chatwidget.ui" line="14"/>
-        <source>ChatRoomWidget</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../chatwidget.ui" line="61"/>
         <source>Send</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="106"/>
+        <location filename="../chatwidget.cpp" line="128"/>
         <source>You have reconnected to the server. You may need to re-join the channel.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="110"/>
+        <location filename="../chatwidget.cpp" line="132"/>
         <source>You have reconnected to the server.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="119"/>
+        <location filename="../chatwidget.cpp" line="141"/>
         <source>You have been disconnected from the server.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="193"/>
+        <location filename="../chatwidget.cpp" line="238"/>
         <source>%1 has joined the chat.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="206"/>
+        <location filename="../chatwidget.cpp" line="251"/>
         <source>%1 has left the chat.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="325"/>
+        <location filename="../chatwidget.cpp" line="303"/>
+        <source>/w &lt;name&gt; &lt;message&gt; - Send a private message.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../chatwidget.cpp" line="304"/>
+        <source>/msg &lt;name&gt; &lt;message&gt; - Send a private message.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../chatwidget.cpp" line="310"/>
+        <location filename="../chatwidget.cpp" line="321"/>
+        <source>Cannot perform command. Not enough arguments.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../chatwidget.cpp" line="413"/>
         <source>Command+V</source>
         <comment>Mac OS X paste command</comment>
         <translation>⌘V</translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="327"/>
+        <location filename="../chatwidget.cpp" line="415"/>
         <source>Ctrl+V</source>
         <comment>Windows and Linux paste command</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../chatwidget.cpp" line="330"/>
-        <source>Clipboard updated</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../chatwidget.cpp" line="330"/>
+        <location filename="../chatwidget.cpp" line="419"/>
         <source>The text &quot;%1&quot; has been copied to your clipboard. Select the join channel textbox in StarCraft II and press %2 to paste the channel name.</source>
         <translation></translation>
     </message>
@@ -155,7 +161,7 @@ Error %2: %3</source>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="393"/>
-        <location filename="../mainwindow.cpp" line="595"/>
+        <location filename="../mainwindow.cpp" line="615"/>
         <source>Queue</source>
         <translation></translation>
     </message>
@@ -186,7 +192,7 @@ Error %2: %3</source>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="916"/>
-        <location filename="../mainwindow.cpp" line="1253"/>
+        <location filename="../mainwindow.cpp" line="1316"/>
         <source>Veto</source>
         <translation></translation>
     </message>
@@ -221,7 +227,7 @@ Error %2: %3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="807"/>
+        <location filename="../mainwindow.cpp" line="829"/>
         <source>Not connected</source>
         <translation></translation>
     </message>
@@ -232,123 +238,123 @@ Error %2: %3</source>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="44"/>
-        <location filename="../mainwindow.cpp" line="230"/>
+        <location filename="../mainwindow.cpp" line="235"/>
         <source>Alpha Version %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="199"/>
+        <location filename="../mainwindow.cpp" line="204"/>
         <source>Welcome to Eros! You need to configure some settings in order to continue. The settings window will now open.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="276"/>
-        <location filename="../mainwindow.cpp" line="341"/>
+        <location filename="../mainwindow.cpp" line="296"/>
+        <location filename="../mainwindow.cpp" line="361"/>
         <source>Abusing these options will result in a ban.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="295"/>
+        <location filename="../mainwindow.cpp" line="315"/>
         <source>Response timeout.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="352"/>
+        <location filename="../mainwindow.cpp" line="372"/>
         <source>Draw Request</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="352"/>
+        <location filename="../mainwindow.cpp" line="372"/>
         <source>Your opponent has requested this game be marked as a draw. Do you wish to accept this request? Clicking yes or not responding will result in this game ending in a draw.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="367"/>
+        <location filename="../mainwindow.cpp" line="387"/>
         <source>Forfeit Request</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="367"/>
+        <location filename="../mainwindow.cpp" line="387"/>
         <source>Your opponent has flagged you as a no-show. Do you wish to accept this request? Clicking yes or not responding will result in you forfeiting this game.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="414"/>
         <source>Eros is still running in the notification tray. Right click the icon if you want to exit.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="428"/>
-        <location filename="../mainwindow.cpp" line="432"/>
-        <location filename="../mainwindow.cpp" line="436"/>
-        <location filename="../mainwindow.cpp" line="440"/>
-        <location filename="../mainwindow.cpp" line="444"/>
+        <location filename="../mainwindow.cpp" line="448"/>
+        <location filename="../mainwindow.cpp" line="452"/>
+        <location filename="../mainwindow.cpp" line="456"/>
+        <location filename="../mainwindow.cpp" line="460"/>
+        <location filename="../mainwindow.cpp" line="464"/>
         <source>Server Broadcast Message</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="428"/>
+        <location filename="../mainwindow.cpp" line="448"/>
         <source>The server is shutting down. %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="432"/>
+        <location filename="../mainwindow.cpp" line="452"/>
         <source>You were forfeited from your matchmaking match by an admin. %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="436"/>
+        <location filename="../mainwindow.cpp" line="456"/>
         <source>Your opponent was forfeited from your matchmaking match by an admin. %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="440"/>
+        <location filename="../mainwindow.cpp" line="460"/>
         <source>Your matchmaking match was ended by an admin. %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="465"/>
+        <location filename="../mainwindow.cpp" line="485"/>
         <source>&lt;strong&gt;Update:&lt;/strong&gt; &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="518"/>
+        <location filename="../mainwindow.cpp" line="538"/>
         <source>Eros Matchmaking</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="518"/>
+        <location filename="../mainwindow.cpp" line="538"/>
         <source>Your queue was aborted because you do not have any verified StarCraft 2 profiles for the selected region.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="548"/>
+        <location filename="../mainwindow.cpp" line="568"/>
         <source>1v1 on &lt;a href=&quot;starcraft://map/%1/%2&quot;&gt;%3&lt;/a&gt;</source>
         <comment>Please keep the link intact.</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="551"/>
+        <location filename="../mainwindow.cpp" line="571"/>
         <source>Forfeit Match</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="575"/>
+        <location filename="../mainwindow.cpp" line="595"/>
         <source>Queued</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="632"/>
+        <location filename="../mainwindow.cpp" line="652"/>
         <source>Confirm Forfeit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="632"/>
+        <location filename="../mainwindow.cpp" line="652"/>
         <source>Are you sure you want to forfeit? This will be recorded as a loss for you and a win for your opponent.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="721"/>
+        <location filename="../mainwindow.cpp" line="741"/>
         <source>Connection error (%1): %2</source>
         <translation></translation>
     </message>
@@ -360,7 +366,7 @@ Error %2: %3</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../mainwindow.cpp" line="493"/>
+        <location filename="../mainwindow.cpp" line="513"/>
         <source>%n (person/people) currently queueing on this region.</source>
         <translation>
             <numerusform>%n person currently queueing on this region.</numerusform>
@@ -368,7 +374,7 @@ Error %2: %3</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../mainwindow.cpp" line="500"/>
+        <location filename="../mainwindow.cpp" line="520"/>
         <source>%n (person/people) currently online.</source>
         <translation>
             <numerusform>%n person currently online.</numerusform>
@@ -376,8 +382,8 @@ Error %2: %3</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../mainwindow.cpp" line="746"/>
-        <location filename="../mainwindow.cpp" line="1318"/>
+        <location filename="../mainwindow.cpp" line="766"/>
+        <location filename="../mainwindow.cpp" line="1381"/>
         <source>%1/%n veto(es) used</source>
         <translation>
             <numerusform></numerusform>
@@ -385,163 +391,163 @@ Error %2: %3</source>
         </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="779"/>
+        <location filename="../mainwindow.cpp" line="801"/>
         <source>Authentication failed. Server error if you previously connected fine.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="785"/>
+        <location filename="../mainwindow.cpp" line="807"/>
         <source>Already logged in. Check that you&apos;re not running another client.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="800"/>
+        <location filename="../mainwindow.cpp" line="822"/>
         <source>Connecting</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="804"/>
+        <location filename="../mainwindow.cpp" line="826"/>
         <source>Disconnecting</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="811"/>
+        <location filename="../mainwindow.cpp" line="833"/>
         <source>Logging in</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="814"/>
+        <location filename="../mainwindow.cpp" line="836"/>
         <source>Connected as %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="832"/>
+        <location filename="../mainwindow.cpp" line="854"/>
         <source>Cannot connect. No server specified.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="836"/>
+        <location filename="../mainwindow.cpp" line="858"/>
         <source>Cannot connect. No authentication token specified.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="848"/>
+        <location filename="../mainwindow.cpp" line="870"/>
         <source>Cannot connect. No profile specified.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="860"/>
+        <location filename="../mainwindow.cpp" line="882"/>
         <source>Select Replay</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="860"/>
+        <location filename="../mainwindow.cpp" line="882"/>
         <source>Replay Files (*.SC2Replay);;All Files (*.*)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="870"/>
+        <location filename="../mainwindow.cpp" line="892"/>
         <source>Unable to open Battle.Net Settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="870"/>
+        <location filename="../mainwindow.cpp" line="892"/>
         <source>You must be logged in before you can manage your Battle.net settings.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1033"/>
+        <location filename="../mainwindow.cpp" line="1094"/>
         <source>View player profile</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1034"/>
+        <location filename="../mainwindow.cpp" line="1095"/>
         <source>Faster</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1035"/>
+        <location filename="../mainwindow.cpp" line="1096"/>
         <source>Copy to clipboard</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1037"/>
+        <location filename="../mainwindow.cpp" line="1098"/>
         <source>You have been automatically joined to this chat room for your match against %1 on %2. Don&apos;t forget to set the game speed to %3 when clicking the map link. We suggest joining the channel %4 on Battle.net. GLHF!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1079"/>
+        <location filename="../mainwindow.cpp" line="1146"/>
         <source>Battle.net Accounts</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1100"/>
+        <location filename="../mainwindow.cpp" line="1167"/>
         <source>Settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1125"/>
+        <location filename="../mainwindow.cpp" line="1192"/>
         <source>Replay Upload Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1125"/>
+        <location filename="../mainwindow.cpp" line="1192"/>
         <source>Error uploading the replay.
 Error %1: %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1132"/>
+        <location filename="../mainwindow.cpp" line="1199"/>
         <source>Upload %1% complete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1158"/>
+        <location filename="../mainwindow.cpp" line="1225"/>
         <source>Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1158"/>
+        <location filename="../mainwindow.cpp" line="1225"/>
         <source>An error occured while trying to monitor your specified SC2 user folder. Please make sure this application has permission to read it.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1192"/>
+        <location filename="../mainwindow.cpp" line="1259"/>
         <source>Uploading %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1251"/>
+        <location filename="../mainwindow.cpp" line="1314"/>
         <source>Unveto</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1255"/>
+        <location filename="../mainwindow.cpp" line="1318"/>
         <source>&lt;em&gt;No info link&lt;/em&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1257"/>
+        <location filename="../mainwindow.cpp" line="1320"/>
         <source>&lt;a href=&quot;%1&quot;&gt;Info link&lt;/a&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1259"/>
+        <location filename="../mainwindow.cpp" line="1322"/>
         <source>View in game</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1263"/>
+        <location filename="../mainwindow.cpp" line="1326"/>
         <source>&lt;em&gt;No Description&lt;/em&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1301"/>
+        <location filename="../mainwindow.cpp" line="1364"/>
         <source>Veto Update Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1301"/>
+        <location filename="../mainwindow.cpp" line="1364"/>
         <source>Failed to update veto for &quot;%1&quot;. %2</source>
         <comment>%1 is the map name. %2 is an error message (found in liberos).</comment>
         <translation></translation>
@@ -549,11 +555,6 @@ Error %1: %2</source>
 </context>
 <context>
     <name>MatchmakingPlayerInfo</name>
-    <message>
-        <location filename="../matchmakingplayerinfo.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
     <message>
         <location filename="../matchmakingplayerinfo.ui" line="65"/>
         <source>Division Name</source>
@@ -580,11 +581,6 @@ Error %1: %2</source>
 </context>
 <context>
     <name>MatchmakingSearchProgressWidget</name>
-    <message>
-        <location filename="../matchmakingsearchprogresswidget.ui" line="20"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
     <message>
         <location filename="../matchmakingsearchprogresswidget.ui" line="36"/>
         <source>Searching...</source>
