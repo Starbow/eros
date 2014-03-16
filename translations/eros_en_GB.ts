@@ -105,19 +105,30 @@ Error %2: %3</source>
     </message>
     <message>
         <location filename="../chatwidget.cpp" line="303"/>
-        <source>/w &lt;name&gt; &lt;message&gt; - Send a private message.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../chatwidget.cpp" line="304"/>
+        <source>name</source>
+        <comment>/msg command help text: username</comment>
+        <translation></translation>
     </message>
     <message>
+        <location filename="../chatwidget.cpp" line="303"/>
         <location filename="../chatwidget.cpp" line="304"/>
-        <source>/msg &lt;name&gt; &lt;message&gt; - Send a private message.</source>
-        <translation type="unfinished"></translation>
+        <source>message</source>
+        <comment>/msg command help text: message</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../chatwidget.cpp" line="303"/>
+        <location filename="../chatwidget.cpp" line="304"/>
+        <source>Send a private message.</source>
+        <comment>/msg command help text: description</comment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../chatwidget.cpp" line="310"/>
         <location filename="../chatwidget.cpp" line="321"/>
         <source>Cannot perform command. Not enough arguments.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../chatwidget.cpp" line="413"/>

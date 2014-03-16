@@ -300,8 +300,8 @@ void ChatWidget::sendMessagePressed()
 			
 			if (command == "help")
 			{
-				writeLog(tr("/w <name> <message> - Send a private message."));
-				writeLog(tr("/msg <name> <message> - Send a private message."));
+				writeLog(QString("/w &lt;%1> &lt;%2> - %3").arg(tr("name", "/msg command help text: username"), tr("message", "/msg command help text: message"), tr("Send a private message.", "/msg command help text: description")));
+				writeLog(QString("/msg &lt;%1> &lt;%2> - %3").arg(tr("name", "/msg command help text: username"), tr("message", "/msg command help text: message"), tr("Send a private message.", "/msg command help text: description")));
 			}
 			else if (command == "w" || command == "msg")
 			{

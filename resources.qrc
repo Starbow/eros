@@ -74,6 +74,7 @@
     <file alias="up_white">res/img/client/icons/up_white.png</file>
   </qresource>
   <qresource prefix="/img/client/icons/flags">
+    <file alias="419">res/img/client/icons/flags/mx.png</file>
     <file alias="ad">res/img/client/icons/flags/ad.png</file>
     <file alias="ae">res/img/client/icons/flags/ae.png</file>
     <file alias="af">res/img/client/icons/flags/af.png</file>

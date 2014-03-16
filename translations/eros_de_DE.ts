@@ -112,19 +112,32 @@ Fehler %2: %3</translation>
     </message>
     <message>
         <location filename="../chatwidget.cpp" line="303"/>
-        <source>/w &lt;name&gt; &lt;message&gt; - Send a private message.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../chatwidget.cpp" line="304"/>
+        <source>name</source>
+        <comment>/msg command help text: username</comment>
+        <translation type="unfinished">Name</translation>
     </message>
     <message>
+        <location filename="../chatwidget.cpp" line="303"/>
         <location filename="../chatwidget.cpp" line="304"/>
-        <source>/msg &lt;name&gt; &lt;message&gt; - Send a private message.</source>
-        <translation type="unfinished"></translation>
+        <source>message</source>
+        <comment>/msg command help text: message</comment>
+        <translation type="unfinished">Nachricht</translation>
+    </message>
+    <message>
+        <location filename="../chatwidget.cpp" line="303"/>
+        <location filename="../chatwidget.cpp" line="304"/>
+        <source>Send a private message.</source>
+        <comment>/msg command help text: description</comment>
+        <translatorcomment>Google translate. Sorry.</translatorcomment>
+        <translation type="unfinished">Private Nachricht schreiben.</translation>
     </message>
     <message>
         <location filename="../chatwidget.cpp" line="310"/>
         <location filename="../chatwidget.cpp" line="321"/>
         <source>Cannot perform command. Not enough arguments.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Google translate. sorry.</translatorcomment>
+        <translation type="unfinished">Befehl kann nicht ausgeführt werden. Nicht genügend Argumente.</translation>
     </message>
     <message>
         <location filename="../chatwidget.cpp" line="413"/>
