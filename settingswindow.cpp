@@ -139,7 +139,7 @@ void SettingsWindow::btnDeleteProfile_click()
 void SettingsWindow::cmbSearchRange_changed()
 {
 	if (config_->activeProfile() == nullptr)
-	return;
+		return;
 
 	config_->activeProfile()->setSearchRange(ui.cmbSearchRange->currentData().toInt());
 }
@@ -312,7 +312,7 @@ void SettingsWindow::refreshProfileInterface()
 	}
 
 	//set options
-	
+	int range = config_->activeProfile()->searchRange();
 	ui.cmbSearchRange->clear();
 	for (int i = 1; i <= 5; i++)
 	{
@@ -321,7 +321,7 @@ void SettingsWindow::refreshProfileInterface()
 
 	for (int i = 0; i < ui.cmbSearchRange->count(); i++)
 	{
-		if (config_->activeProfile()->searchRange() == ui.cmbSearchRange->itemData(i).toInt())
+		if (range == ui.cmbSearchRange->itemData(i).toInt())
 		{
 			ui.cmbSearchRange->setCurrentIndex(i);		
 			break;
