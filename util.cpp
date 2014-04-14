@@ -11,30 +11,12 @@ Util::~Util()
 
 }
 
-QString Util::getIcon(const QString &username, const QString &division, bool small)
+QString Util::getIcon(int division, bool small)
 {
-	int league = 1;
-	QString adv("");
-	if (division.contains("bronze", Qt::CaseSensitivity::CaseInsensitive))
-		league = 1;
-	else if (division.contains("silver", Qt::CaseSensitivity::CaseInsensitive))
-		league = 2;
-	else if (division.contains("gold", Qt::CaseSensitivity::CaseInsensitive))
-		league = 3;
-	else if (division.contains("platinum", Qt::CaseSensitivity::CaseInsensitive))
-		league = 4;
-	else if (division.contains("diamond", Qt::CaseSensitivity::CaseInsensitive))
-		league = 5;
-	
-	if (division.endsWith("1") || division == "Diamond")
-	{
-		adv = "_adv";
-	}
-
 	if (small)
-		return QString(":/img/client/icons/league_%1%2").arg(league).arg(adv);
+		return QString(":/img/client/icons/league_%1").arg(division);
 	else
-		return QString(":/img/client/rank_icons/league_%1%2").arg(league).arg(adv);
+		return QString(":/img/client/rank_icons/league_%1").arg(division);
 }
 
 QString Util::sanitizeHtml(const QString &data)

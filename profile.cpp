@@ -5,7 +5,7 @@ Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 	: QObject(parent)
 {
 	this->settings_ = settings;
-
+	this->queue_regions_ = QList<ErosRegion>();
 	if (blank == false)
 	{
 		this->username_ = settings->value("username", "").toString();
@@ -14,6 +14,16 @@ Profile::Profile(QObject *parent, QSettings *settings, bool blank)
 		this->language_ = settings->value("language", "English").toString();
 		this->search_range_ = settings->value("searchrange", 1).toInt();
 		this->replay_folder_ = settings->value("replayfolder", "").toString();
+		int queue_region_count = this->settings_->beginReadArray("queue");
+		for (int i = 0; i < queue_region_count; i++)
+		{
+			this->settings_->setArrayIndex(i);
+			ErosRegion region = (ErosRegion)settings->value("region", 0).toInt();
+			if (region > 0) {
+				this->queue_regions_ << region;
+			}
+		}
+		this->settings_->endArray();
 	}
 	else
 	{
@@ -44,6 +54,16 @@ void Profile::save()
 	settings_->setValue("chatlinks", this->chat_links_);
 	settings_->setValue("searchrange", this->search_range_);
 	settings_->setValue("replayfolder", this->replay_folder_);
+	settings_->beginWriteArray("queue", this->queue_regions_.length());
+	for (int i = 0; i < this->queue_regions_.length(); i++)
+	{
+		this->settings_->setArrayIndex(i);
+		settings_->setValue("region", this->queue_regions_[i]);
+	}
+	settings_->endArray();
+}
+const QList<ErosRegion> &Profile::queueRegions() const {
+	return this->queue_regions_;
 }
 const QString &Profile::username() const
 {
@@ -97,4 +117,22 @@ void Profile::setChatLinks(bool chatlinks)
 void Profile::setSearchRange(int range)
 {
 	this->search_range_ = range;
+}
+
+void Profile::setRegionQueue(ErosRegion region, bool queue)
+{
+	if (this->queue_regions_.contains(region))
+	{
+		if (!queue)
+		{
+			this->queue_regions_.removeAll(region);
+		}
+
+		return;
+	}
+
+	if (queue)
+	{
+		this->queue_regions_.append(region);
+	}
 }

@@ -378,16 +378,30 @@ QLineEdit:focus
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QComboBox" name="cmbRegion">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
+                     <layout class="QVBoxLayout" name="verticalLayout_7">
+                      <property name="spacing">
+                       <number>0</number>
                       </property>
-                     </widget>
+                      <item>
+                       <widget class="QComboBox" name="cmbRegion">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="chkQueueRegion">
+                        <property name="text">
+                         <string>Queue on this region</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
                     </item>
-                    <item>
+                    <item alignment="Qt::AlignTop">
                      <widget class="QPushButton" name="btnQueue">
                       <property name="text">
                        <string>Queue</string>

@@ -74,8 +74,12 @@ void ChatWidget::populateUserList()
 	for (int i = 0; i < users.size(); i++)
 	{
 		User *user = users.at(i);
-		const QPair <int, QString> &division = this->eros_->divisions()->division(user->ladderStatsGlobal()->points());
-		QListWidgetItem *item = new QListWidgetItem(QIcon(Util::getIcon(user->username(), division.second, true)), user->username());
+		QListWidgetItem *item = nullptr;
+		if (user->division() == nullptr) 
+			item = new QListWidgetItem(user->username());
+		else
+			item = new QListWidgetItem(QIcon(Util::getIcon(user->division()->id(), true)), user->username());
+		
 		this->ui.listUsers->addItem(item);
 	}
 	this->ui.listUsers->sortItems();
@@ -117,6 +121,8 @@ const QString &ChatWidget::name() const {
 	{
 		return this->user_->username();
 	}
+
+	return "";
 }
 
 void ChatWidget::connected()
@@ -183,9 +189,8 @@ QString ChatWidget::getUsername(User *user)
 	}
 	else
 	{
-		const QPair <int, QString> &division = this->eros_->divisions()->division(stats->points());
-		// Add special icons.
-		return QString("<a title=\"%1\"><strong>%2</strong></a>").arg(division.second, Util::sanitizeHtml(user->username()));
+		// TODO: Add special icons.
+		return QString("<a title=\"%1\"><strong>%2</strong></a>").arg(user->division()->name(), Util::sanitizeHtml(user->username()));
 	}
 }
 
@@ -237,8 +242,11 @@ void ChatWidget::addUser(User *user)
 		QString username = getUsername(user);
 		writeLog(colourise(QString(tr("%1 has joined the chat.")).arg(username), user));
 	}
-	const QPair <int, QString> &division = this->eros_->divisions()->division(user->ladderStatsGlobal()->points());
-	QListWidgetItem *item = new QListWidgetItem(QIcon(Util::getIcon(user->username(), division.second, true)), user->username());
+	QListWidgetItem *item = nullptr;
+	if (user->division() == nullptr) 
+		item = new QListWidgetItem(user->username());
+	else
+		item = new QListWidgetItem(QIcon(Util::getIcon(user->division()->id(), true)), user->username());
 	this->ui.listUsers->addItem(item);
 	this->ui.listUsers->sortItems();
 }

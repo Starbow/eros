@@ -54,7 +54,7 @@ private slots:
 	void btnQueue_pressed();
 	void btnDraw_pressed();
 	void btnNoShow_pressed();
-
+	void chkQueueRegion_stateChanged(int state);
 
 	void lstChats_currentItemChanged(QListWidgetItem *, QListWidgetItem *);
 	void lstChats_itemDoubleClicked(QListWidgetItem *);
@@ -130,6 +130,7 @@ signals:
 
 	// Matchmaking slots
 	void queueMatchmaking(ErosRegion region, int search_radius);
+	void queueMatchmaking(ErosRegionList regions, int search_radius);
 	void dequeueMatchmaking();
 	void forfeitMatchmaking();
 

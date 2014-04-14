@@ -24,11 +24,7 @@
     <file alias="NotoSans-Regular">res/font/NotoSans-Regular.ttf</file>
   </qresource>
   <qresource prefix="/img/client/rank_icons">
-    <file alias="league_1_adv">res/img/client/large_icons/league_1_adv.png</file>
-    <file alias="league_2_adv">res/img/client/large_icons/league_2_adv.png</file>
-    <file alias="league_3_adv">res/img/client/large_icons/league_3_adv.png</file>
-    <file alias="league_4_adv">res/img/client/large_icons/league_4_adv.png</file>
-    <file alias="league_5_adv">res/img/client/large_icons/league_5_adv.png</file>
+    <file alias="league_0">res/img/client/large_icons/league_0.png</file>
     <file alias="league_1">res/img/client/large_icons/league_1.png</file>
     <file alias="league_2">res/img/client/large_icons/league_2.png</file>
     <file alias="league_3">res/img/client/large_icons/league_3.png</file>
@@ -47,16 +43,12 @@
     <file alias="min">res/img/client/ui/min.png</file>
   </qresource>
   <qresource prefix="/img/client/icons">
+    <file alias="league_0">res/img/client/icons/league_0.png</file>
     <file alias="profile">res/img/client/icons/profile.png</file>
     <file alias="cross">res/img/client/icons/cross.png</file>
     <file alias="clipboard">res/img/client/icons/clipboard.png</file>
     <file alias="icon_1024x1024">res/img/client/icons/eros.iconset/icon_512x512@2x.png</file>
     <file alias="icon_32x32">res/img/client/icons/eros.iconset/icon_32x32.png</file>
-    <file alias="league_1_adv">res/img/client/icons/league_1_adv.png</file>
-    <file alias="league_2_adv">res/img/client/icons/league_2_adv.png</file>
-    <file alias="league_3_adv">res/img/client/icons/league_3_adv.png</file>
-    <file alias="league_4_adv">res/img/client/icons/league_4_adv.png</file>
-    <file alias="league_5_adv">res/img/client/icons/league_5_adv.png</file>
     <file alias="match_chat">res/img/client/icons/selected matchchat.png</file>
     <file alias="padlock">res/img/client/icons/padlock.png</file>
     <file alias="private_chat">res/img/client/icons/privatechat.png</file>

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include "../liberos/enums.h"
 
 class Profile : public QObject
 {
@@ -16,6 +17,7 @@ public:
 	const QString &token() const;
 	const QString &language() const;
 	const QString &replayFolder() const;
+	const QList<ErosRegion> &queueRegions() const;
 	bool chatLinks() const;
 	int searchRange() const;
 
@@ -25,6 +27,7 @@ public:
 	void setChatLinks(bool);
 	void setSearchRange(int);
 	void setReplayFolder(const QString &);
+	void setRegionQueue(ErosRegion, bool);
 
 	void save();
 
@@ -37,6 +40,7 @@ private:
 	QString language_;
 	QString replay_folder_;
 	int search_range_;	
+	QList<ErosRegion> queue_regions_;
 
 signals:
 	void languageChanged(const QString &language);

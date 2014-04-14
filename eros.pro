@@ -80,4 +80,6 @@ TRANSLATIONS += translations/eros_en_GB.ts\
                 translations/eros_de_DE.ts\
                 translations/eros_ko_KR.ts\
                 translations/eros_es_419.ts\
+				translations/eros_es_ES.ts\
+				translations/eros_fr_FR.ts\
                 translations/eros_blank.ts

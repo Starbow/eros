@@ -117,7 +117,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(eros_, SIGNAL(replayUploadError(ErosError)), this, SLOT(erosReplayUploadError(ErosError)));
 	QObject::connect(eros_, SIGNAL(replayUploaded()), this, SLOT(erosReplayUploaded()));
 	QObject::connect(eros_, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(erosUploadProgress(qint64, qint64)));
-
+	
 	QObject::connect(eros_, SIGNAL(longProcessStateChanged(ErosLongProcessState)), this, SLOT(erosLongProcessStateChanged(ErosLongProcessState)));
 	QObject::connect(eros_, SIGNAL(drawRequested()), this, SLOT(erosDrawRequested()));
 	QObject::connect(eros_, SIGNAL(drawRequestFailed()), this, SLOT(erosDrawRequestFailed()));
@@ -138,6 +138,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this, SIGNAL(leaveChatRoom(ChatRoom *)), eros_, SLOT(leaveChatRoom(ChatRoom *)));
 
 	QObject::connect(this, SIGNAL(queueMatchmaking(ErosRegion, int)), eros_, SLOT(queueMatchmaking(ErosRegion, int)));
+	QObject::connect(this, SIGNAL(queueMatchmaking(ErosRegionList, int)), eros_, SLOT(queueMatchmaking(ErosRegionList, int)));
 	QObject::connect(this, SIGNAL(dequeueMatchmaking()), eros_, SLOT(dequeueMatchmaking()));
     QObject::connect(this, SIGNAL(forfeitMatchmaking()), eros_, SLOT(forfeitMatchmaking()));
 
@@ -149,7 +150,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(this, SIGNAL(acknowledgeLongProcess(bool)), eros_, SLOT(acknowledgeLongProcess(bool)));
 
 	QObject::connect(this, SIGNAL(toggleVeto(Map*)), eros_, SLOT(toggleVeto(Map*)));
-
+	
 
 
 	// timers
@@ -193,7 +194,7 @@ MainWindow::MainWindow(Eros *eros, QWidget *parent )
 	QObject::connect(ui.btnNoShow, SIGNAL(clicked()), this, SLOT(btnNoShow_pressed()));
 	QObject::connect(ui.lstMaps, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(lstMaps_currentItemChanged(QListWidgetItem *, QListWidgetItem *)));
 	QObject::connect(ui.btnToggleVeto, SIGNAL(clicked()), this, SLOT(btnToggleVeto_clicked()));
-
+	QObject::connect(ui.chkQueueRegion, SIGNAL(stateChanged(int)), this, SLOT(chkQueueRegion_stateChanged(int)));
 #if !defined(Q_OS_MAC)
 	this->tray_icon_->show();
 #endif
@@ -547,8 +548,7 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 	this->matchmaking_timer_->stop();
 	this->long_process_timer_->start();
 	this->ui.frmLongProcessInterface->setMaximumHeight(400);
-	int regionIndex = ui.cmbRegion->currentData().toInt();
-	ErosRegion region = eros_->activeRegions()[regionIndex];
+	ErosRegion region = match->region();
 
 	QLayoutItem* item;
 	while ( ( item = ui.frmMatchmakingOpponent->layout()->takeAt(0)) != NULL )
@@ -557,15 +557,15 @@ void MainWindow::erosMatchmakingMatchFound(MatchmakingMatch *match)
 		delete item;
 	}
 
-	UserLadderStats *stats = match->opponent()->ladderStats()[region];
-	const QPair<int, QString> &region_division = eros_->divisions()->division(stats->points());
+	const UserLadderStats *stats = match->opponent()->ladderStatsGlobal();
+	
 
-	MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(match->opponent()->username(), region_division.second, stats, true, this);
+	MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(match->opponent()->username(), match->opponent()->division(), stats, true, this);
 	ui.frmMatchmakingOpponent->layout()->addWidget(region_info);
 
 	ui.lblVS->setText("VS");
 	ui.lblVS->setMaximumHeight(9999);
-	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\">%3</a>", "Please keep the link intact.").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
+	QString map = tr("1v1 on <a href=\"starcraft://map/%1/%2\"><img src=\":/img/client/icons/flags/%4\"> %3</a>", "Please keep the link intact.").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName(), Eros::regionToString(region));
 	ui.lblMapInfo->setText(map);
 	ui.lblMapInfo->setMaximumHeight(9999);
 	ui.btnQueue->setText(tr("Forfeit Match"));
@@ -593,7 +593,8 @@ void MainWindow::setQueueState(bool queueing)
 	if (queueing)
 	{
 		ui.btnQueue->setText(tr("Queued"));
-		ui.cmbRegion->setEnabled(false);
+		ui.cmbRegion->setDisabled(true);
+		ui.chkQueueRegion->setDisabled(true);
 		this->matchmaking_start_->restart();
 		this->matchmaking_timer_->start();
 
@@ -612,6 +613,7 @@ void MainWindow::setQueueState(bool queueing)
 		this->ui.frmLongProcessInterface->setMaximumHeight(0);
 		this->ui.frmLongProcessInterface->setDisabled(true);
 		ui.cmbRegion->setEnabled(true);
+		ui.chkQueueRegion->setEnabled(true);
 		ui.btnQueue->setText(tr("Queue"));
 		QLayoutItem* item;
 		while ( ( item = ui.frmMatchmakingOpponent->layout()->takeAt(0)) != NULL )
@@ -641,10 +643,16 @@ void MainWindow::btnQueue_pressed()
 		}
 		else if (eros_->matchmakingState() == ErosMatchmakingState::Idle || eros_->matchmakingState() == ErosMatchmakingState::Aborted || eros_->matchmakingState() == ErosMatchmakingState::InvalidRegion)
 		{
+			const QList<ErosRegion> &regions = this->config_->activeProfile()->queueRegions();
+			if (regions.length() == 0) 
+			{
+				return;
+			}
+
 			int regionIndex = ui.cmbRegion->currentData().toInt();
 			ErosRegion region = eros_->activeRegions()[regionIndex];
 			this->config_->setPreferredRegion(region);
-			emit queueMatchmaking(region, this->config_->activeProfile()->searchRange());
+			emit queueMatchmaking(regions, this->config_->activeProfile()->searchRange());
 			ui.btnQueue->setEnabled(false);
 		}
 		else if (eros_->matchmakingState() == ErosMatchmakingState::Matched)
@@ -674,20 +682,32 @@ void MainWindow::cmbRegion_currentIndexChanged (int index)
 	if (user != nullptr)
 	{
 
-		UserLadderStats *stats = user->ladderStats()[region];
-		const QPair<int, QString> &region_division = eros_->divisions()->division(stats->points());
+		const UserLadderStats *stats = user->ladderStatsGlobal();
 		QLayoutItem* item;
 		while ( ( item = ui.frmLocalInfo->layout()->takeAt(0)) != NULL )
 		{
 			delete item->widget();
 			delete item;
 		}
-		MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(user->username(), region_division.second, stats, false, this);
+		MatchmakingPlayerInfo *region_info = new MatchmakingPlayerInfo(user->username(), user->division(), stats, false, this);
 		ui.frmLocalInfo->layout()->addWidget(region_info);
-
 	}
 
-	//ui.lblRegionStats->setText(tr("%1 people currently queueing on this region.").arg(eros_->regionSearchingUserCount(region)));
+	const QList<Character*> &characters = this->eros_->localUser()->characters();
+
+	for (int i = 0; i < characters.length(); i++)
+	{
+		if (characters[i]->region() == region)
+		{
+			ui.chkQueueRegion->setEnabled(true);
+			ui.chkQueueRegion->setChecked(this->config_->activeProfile()->queueRegions().contains(region));
+			return;
+		}
+	}
+
+	ui.chkQueueRegion->setDisabled(true);
+	ui.chkQueueRegion->setChecked(false);
+	
 }
 
 void MainWindow::cmbMapRegion_currentIndexChanged (int index)
@@ -1087,10 +1107,10 @@ void MainWindow::erosChatRoomJoined(ChatRoom *room)
 	{
 		if (room->key() == match->chatRoom()->key())
 		{
-			int regionIndex = ui.cmbRegion->currentData().toInt();
-			ErosRegion region = eros_->activeRegions()[regionIndex];
+			
+			ErosRegion region = match->region();
 			//Split these up to minimise HTML in translation files.
-			QString map = QString("<a href=\"starcraft://map/%1/%2\">%3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName());
+			QString map = QString("<a href=\"starcraft://map/%1/%2\"><img src=\":/img/client/icons/flags/%4\"> %3</a>").arg(QString::number((int)region), QString::number(match->mapId()), match->mapName(), Eros::regionToString(region));
 			QString opponent = QString("<strong>%1</strong> <a href=\"http://www.starbowmod.com/ladder/player/%2\" title=\"%3\"><img src=\":/img/client/icons/profile\" /></a>").arg(match->opponent()->username(), QString::number(match->opponent()->id()), tr("View player profile"));
 			QString speed = QString("<strong>%1</strong>").arg(tr("Faster"));
 			QString channel = QString("<strong>%1</strong> <a href=\"clipboard:%1\" title=\"%2\"><img src=\":/img/client/icons/clipboard\" /></a>").arg(match->battleNetChannel(), tr("Copy to clipboard"));
@@ -1379,5 +1399,22 @@ void MainWindow::erosVetoesUpdated()
 		}
 
 		ui.cmbMapRegion->setItemText(i, QString("%1 (%2)").arg(Eros::regionToLongString(this->eros_->activeRegions()[i]), tr("%1/%n veto(es) used", "", eros_->maxVetoes()).arg(vetoes)));
+	}
+}
+
+void MainWindow::chkQueueRegion_stateChanged(int state) 
+{
+	int regionIndex = ui.cmbRegion->currentData().toInt();
+	ErosRegion current_region = eros_->activeRegions()[regionIndex];
+
+	this->config_->activeProfile()->setRegionQueue(current_region, ui.chkQueueRegion->isChecked());
+
+	if (this->config_->activeProfile()->queueRegions().length() == 0) 
+	{
+		ui.btnQueue->setDisabled(true);
+	}
+	else
+	{
+		ui.btnQueue->setDisabled(false);
 	}
 }
